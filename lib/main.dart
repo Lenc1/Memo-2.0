@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 void main() {
   runApp(const MyApp());
@@ -7,40 +9,20 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: '电子日记程序',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: '电子日记'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -48,68 +30,219 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  List<DiaryEntry> _diaries = [];
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  // 跳转到新建日记页面
+  void _navigateToNewDiaryPage(BuildContext context) async {
+    final newDiary = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const NewDiaryPage()),
+    );
+    if (newDiary != null) {
+      setState(() {
+        _diaries.add(newDiary);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        backgroundColor: Colors.deepPurple,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      body: ListView.builder(
+        itemCount: _diaries.length,
+        itemBuilder: (context, index) {
+          final diary = _diaries[index];
+          return ListTile(
+            title: Text('日记 #${index + 1}'),
+            subtitle: Text(diary.content),
+            onTap: () {
+              // 查看日记详细内容
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DiaryDetailPage(diary: diary),
+                ),
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _navigateToNewDiaryPage(context),
+        tooltip: '新建日记',
+        child: const Icon(Icons.add),
+        backgroundColor: Colors.blue,
+      ),
+    );
+  }
+}
+
+class DiaryEntry {
+  String content;
+  List<File> images;
+
+  DiaryEntry({required this.content, required this.images});
+}
+
+class NewDiaryPage extends StatefulWidget {
+  const NewDiaryPage({super.key});
+
+  @override
+  _NewDiaryPageState createState() => _NewDiaryPageState();
+}
+
+class _NewDiaryPageState extends State<NewDiaryPage> {
+  final TextEditingController _controller = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
+  List<File> _images = [];
+
+  Future<void> _pickImages() async {
+    final pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles != null && pickedFiles.length <= 3) {
+      setState(() {
+        _images = pickedFiles.map((e) => File(e.path)).toList();
+      });
+    } else {
+      // 提示最多选择3张图片
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('最多只能选择三张图片')),
+      );
+    }
+  }
+
+  void _saveDiary() {
+    if (_controller.text.isNotEmpty && _images.isNotEmpty) {
+      final newDiary = DiaryEntry(
+        content: _controller.text,
+        images: _images,
+      );
+      Navigator.pop(context, newDiary);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请填写日记内容并选择图片')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('新建日记'),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have pushed the button this many times:',
+              '请输入您的日记内容：',
+              style: TextStyle(fontSize: 20),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            const SizedBox(height: 20),
+            TextField(
+              controller: _controller,
+              maxLines: 10,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: '在这里写下您的日记...',
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _pickImages,
+              child: const Text('选择图片（最多3张）'),
+            ),
+            const SizedBox(height: 20),
+            if (_images.isNotEmpty) ...[
+              const Text('已选择的图片：'),
+              SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _images.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      child: Image.file(
+                        _images[index],
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _saveDiary,
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green,
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text('保存日记'),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class DiaryDetailPage extends StatelessWidget {
+  final DiaryEntry diary;
+
+  const DiaryDetailPage({super.key, required this.diary});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('日记详情'),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: <Widget>[
+            Text(
+              diary.content,
+              style: const TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 20),
+            if (diary.images.isNotEmpty) ...[
+              const Text('日记图片：'),
+              SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: diary.images.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                      child: Image.file(
+                        diary.images[index],
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }
