@@ -61,6 +61,13 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
+  String _getCurrentDate() {
+    // 获取当前日期
+    DateTime now = DateTime.now();
+
+    // 格式化为字符串，格式为 YYYY-MM-DD
+    return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
             margin:
                 const EdgeInsets.only(top: 22,right: 26,left: 26),
             decoration: BoxDecoration(
-              color: Colors.white, // 设置背景颜色为白色
-              borderRadius: BorderRadius.circular(16), // 设置圆角
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
               children: [
@@ -198,9 +205,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Container(
                           margin: const EdgeInsets.only(
                               top: 16, left: 22, bottom: 68),
-                          child: const Text(
-                            '2025.01.26',
-                            style: TextStyle(
+                          child: Text(
+                            _getCurrentDate(),
+                            style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w900,
                             ),
@@ -251,14 +258,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(20),
-              child: Column(
+              child: Column( // TODO: 热力图
                 children: [
                   const SizedBox(height: 30),
+
                 ],
               ),
             ),
           ),
-          Expanded(
+          Expanded( // TODO: 日记列表美化
             child: ListView.builder(
               itemCount: _diaries.length,
               itemBuilder: (context, index) {

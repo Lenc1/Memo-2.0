@@ -1,5 +1,6 @@
 // new_diary.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -43,70 +44,148 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
     }
   }
 
+  String _inputText = '';
+  bool _isEditing = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('新建日记'),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            const Text(
-              '请输入您的日记内容：',
-              style: TextStyle(fontSize: 20),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _controller,
-              maxLines: 10,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: '在这里写下您的日记...',
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _pickImages,
-              child: const Text('选择图片（最多3张）'),
-            ),
-            const SizedBox(height: 20),
-            if (_images.isNotEmpty) ...[
-              const Text('已选择的图片：'),
-              SizedBox(
-                height: 100,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _images.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                      child: Image.file(
-                        _images[index],
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
+      backgroundColor: const Color.fromRGBO(240, 251, 255, 1),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: 392,
+          height: 600,
+          margin: const EdgeInsets.only(top: 22, left: 10, right: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              Column(
+                children: <Widget>[
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          print("back");
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          width: 22,
+                          height: 20,
+                          margin: const EdgeInsets.only(top: 37, left: 54),
+                          decoration: const BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage('lib/assets/back.png'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
                       ),
-                    );
-                  },
-                ),
+                      Container(
+                        margin: EdgeInsets.only(top:37,left: 150),
+                        child: IconButton(
+                          icon: Icon(_isEditing ? Icons.menu_book : Icons.edit),
+                          onPressed: () {
+                            setState(() {
+                              _isEditing = !_isEditing;
+                            });
+                          },
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(left: 20, top: 36),
+                        child: ElevatedButton(
+                          onPressed: _saveDiary,
+                          style: ElevatedButton.styleFrom(
+                            primary: const Color.fromRGBO(64, 185, 222, 1),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 17, vertical: 2),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                          child: const Text(
+                            '保存',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    margin: EdgeInsets.only(left: 51, right: 51),
+                    child: Column(
+                      children: [
+                        _isEditing ?
+                        TextField(
+                          maxLines: 10,
+                          style: const TextStyle(
+                            fontSize: 17,
+                          ),
+                          controller: _controller,
+                          onChanged: (text) {
+                            setState(() {
+                              print("_inputText");
+                              _inputText = text;
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            hintText: '在此输入文字...',
+                          ),
+                          // TODO: markdown显示
+                        ): Expanded(child: SingleChildScrollView(
+                          child: Markdown(
+                          data: _inputText,
+                            styleSheet: MarkdownStyleSheet(
+                              h1: TextStyle(fontSize: 14),
+                            ),
+                          ),
+                        ))
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _pickImages,
+                    child: const Text('选择图片（最多3张）'),
+                  ),
+                  const SizedBox(height: 20),
+                  if (_images.isNotEmpty) ...[
+                    const Text('已选择的图片：'),
+                    SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _images.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 5.0),
+                            child: Image.file(
+                              _images[index],
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 20),
+                ],
               ),
             ],
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _saveDiary,
-              style: ElevatedButton.styleFrom(
-                primary: Colors.green,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text('保存日记'),
-            ),
-          ],
+          ),
         ),
       ),
     );
