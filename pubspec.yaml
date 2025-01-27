@@ -16,6 +16,7 @@ dependencies:
   flutter_heatmap_calendar: ^1.0.5
   provider: ^6.1.2
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -24,5 +25,10 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - lib/assets/avator.jpg
+    - lib/assets/addition_fill.png
+    - lib/assets/tag.png
+    - lib/assets/pen.png
 
 
