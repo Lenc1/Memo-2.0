@@ -55,7 +55,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
         alignment: Alignment.topCenter,
         child: Container(
           width: 392,
-          height: 600,
+          height: 700,
           margin: const EdgeInsets.only(top: 22, left: 10, right: 10),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -85,7 +85,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top:37,left: 150),
+                        margin: EdgeInsets.only(top: 37, left: 150),
                         child: IconButton(
                           icon: Icon(_isEditing ? Icons.menu_book : Icons.edit),
                           onPressed: () {
@@ -116,47 +116,91 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                           ),
                         ),
                       ),
-
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  Container(
+                    margin: EdgeInsets.only(
+                        top: 12, left: 51, right: 51, bottom: 12),
+                    child: const TextField(
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Color.fromRGBO(46, 46, 46, 1),
+                      ),
+                      decoration: InputDecoration(
+                          hintText: '标题',
+                          hintStyle: TextStyle(
+                            color: Color.fromRGBO(189, 189, 189, 1),
+                          )),
+                    ),
+                  ),
                   Container(
                     margin: EdgeInsets.only(left: 51, right: 51),
                     child: Column(
                       children: [
-                        _isEditing ?
-                        TextField(
-                          maxLines: 10,
-                          style: const TextStyle(
-                            fontSize: 17,
-                          ),
-                          controller: _controller,
-                          onChanged: (text) {
-                            setState(() {
-                              print("_inputText");
-                              _inputText = text;
-                            });
-                          },
-                          decoration: const InputDecoration(
-                            hintText: '在此输入文字...',
-                          ),
-                          // TODO: markdown显示
-                        ): Expanded(child: SingleChildScrollView(
-                          child: Markdown(
-                          data: _inputText,
-                            styleSheet: MarkdownStyleSheet(
-                              h1: TextStyle(fontSize: 14),
-                            ),
-                          ),
-                        ))
+                        _isEditing
+                            ? TextField(
+                                maxLines: 10,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.normal,
+                                  color: Color.fromRGBO(46, 46, 46, 1),
+                                ),
+                                controller: _controller,
+                                onChanged: (text) {
+                                  setState(() {
+                                    print("_inputText");
+                                    _inputText = text;
+                                  });
+                                },
+                                decoration: const InputDecoration(
+                                  hintText: '在此输入文字...',
+                                  // border: InputBorder.none, //取消下划线
+                                ),
+                                // TODO: markdown显示
+                              )
+                            : Expanded(
+                                child: SingleChildScrollView(
+                                child: Markdown(
+                                  data: _inputText,
+                                  styleSheet: MarkdownStyleSheet(
+                                    h1: TextStyle(fontSize: 14),
+                                  ),
+                                ),
+                              ))
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _pickImages,
-                    child: const Text('选择图片（最多3张）'),
+                  GestureDetector(
+                    onTap: () {
+                      print("picking Image...");
+                      _pickImages();
+                    },
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 29,
+                          height: 29,
+                          margin: const EdgeInsets.only(left: 54),
+                          decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                  image: AssetImage('lib/assets/photos.png'))),
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        const Text(
+                          '上传照片...',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Color.fromRGBO(130, 130, 130, 1),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 20),
                   if (_images.isNotEmpty) ...[
