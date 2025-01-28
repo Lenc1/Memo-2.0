@@ -8,13 +8,12 @@ import 'models/memo_weiget.dart';
 
 import 'pages/profile.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
 
-  windowManager.setSize(
-      const Size(470,800) //自定义窗口大小
-  );
+  windowManager.setSize(const Size(470, 800) //自定义窗口大小
+      );
 
   windowManager.setResizable(false);
   runApp(const MyApp());
@@ -84,6 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(builder: (context) => const ProfilePage()),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,69 +101,76 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               children: [
                 Container(
-                    width: 253,
-                    height: 73,
-                    margin:
-                        const EdgeInsets.only(left: 12, top: 26, right: 121),
-                    decoration: BoxDecoration(
-                      color: const Color.fromRGBO(242, 242, 242, 1),
-                      borderRadius: BorderRadius.circular(37),
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        _navigateToProfilePage(context);
-                        print('Contaner clicked!');
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 61,
-                            height: 61,
-                            margin: const EdgeInsets.only(
-                                top: 6, left: 8, right: 14, bottom: 7),
-                            decoration: const BoxDecoration(
+                  width: 253,
+                  height: 73,
+                  margin: const EdgeInsets.only(left: 12, top: 26, right: 121),
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(242, 242, 242, 1),
+                    borderRadius: BorderRadius.circular(37),
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      _navigateToProfilePage(context);
+                      print('Contaner clicked!');
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 61,
+                          height: 61,
+                          margin: const EdgeInsets.only(
+                              top: 6, left: 8, right: 14, bottom: 7),
+                          decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                               image: DecorationImage(
                                 image: AssetImage('lib/assets/avator.jpg'),
                                 fit: BoxFit.cover,
                               ),
-                            ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color.fromRGBO(0, 0, 0, 0.25),
+                                  offset: Offset(0, 2),
+                                  blurRadius: 4,
+                                  spreadRadius: 0,
+                                ),
+                              ]),
+                        ),
+                        Container(
+                          alignment: Alignment.topLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: const [
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                'Lenci',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color.fromRGBO(41, 41, 41, 1),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 4,
+                              ),
+                              Text(
+                                '已使用 Memo 280 天',
+                                style: TextStyle(
+                                  fontFamily: 'SourceHanSans',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color.fromRGBO(117, 117, 117, 1),
+                                ),
+                              ),
+                            ],
                           ),
-                          Container(
-                            alignment: Alignment.topLeft,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  'Lenci',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color.fromRGBO(41, 41, 41, 1),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 4,
-                                ),
-                                Text(
-                                  '已使用 Memo 280 天',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color.fromRGBO(117, 117, 117, 1),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
+                ),
                 const SizedBox(height: 24),
                 NewMemoWidget(
                     onPressed: () => _navigateToNewDiaryPage(context)),
@@ -190,11 +197,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [], // 取消阴影
                     ),
                     child: GestureDetector(
                       onTap: () {
-                        // 查看日记详细内容
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -239,22 +244,28 @@ class _MyHomePageState extends State<MyHomePage> {
                               margin: const EdgeInsets.only(left: 31, top: 63),
                               child: Text(
                                 diary.content.length > 10
-                                    ? diary.content.substring(0, 10) + '...'
+                                    ? '${diary.content.substring(0, 10)}...'
                                     : diary.content,
-                                maxLines: 1, // 限制为单行显示
-                                overflow: TextOverflow.ellipsis, // 超出部分用...表示
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             Container(
-                              width: 82,
-                              height: 82,
-                              margin: const EdgeInsets.only(top: 37, left: 265),
+                              width: 115,
+                              height: 115,
+                              margin: const EdgeInsets.only(top: 16, left: 260),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Color.fromRGBO(0, 0, 0, 0.25),
+                                      offset: Offset(0, 2),
+                                      blurRadius: 4,
+                                      spreadRadius: 0,
+                                    ),
+                                  ]),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                // 使图片也具有圆角
                                 child: Image.file(
                                   diary.images[0],
                                   fit: BoxFit.cover,

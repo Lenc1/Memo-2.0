@@ -38,5 +38,11 @@ flutter:
     - lib/assets/back.png
     - lib/assets/photos.png
     - lib/assets/backfile.png
+  fonts:
+    - family: SourceHanSans
+      fonts:
+        - asset: lib/assets/fonts/SourceHanSansSC-Regular-2.otf
+        - asset: lib/assets/fonts/SourceHanSansSC-Bold-2.otf
+          weight: 700
 
 

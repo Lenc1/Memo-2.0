@@ -8,8 +8,11 @@ class NewMemoWidget extends StatelessWidget {
     DateTime now = DateTime.now();
     return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
   }
+
   const NewMemoWidget({required this.onPressed});
+
   final VoidCallback onPressed;
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -42,13 +45,14 @@ class NewMemoWidget extends StatelessWidget {
               margin: const EdgeInsets.only(left: 20, top: 48),
               decoration: BoxDecoration(
                 color: const Color.fromRGBO(156, 204, 219, 1),
-                borderRadius: BorderRadius.circular(27),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Container(
                 margin: const EdgeInsets.only(left: 54, top: 16),
                 child: const Text(
                   '添加Memo',
                   style: TextStyle(
+                    fontFamily: 'SourceHanSans',
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
@@ -62,12 +66,18 @@ class NewMemoWidget extends StatelessWidget {
               margin: const EdgeInsets.only(
                   top: 13, right: 12, left: 155, bottom: 13),
               decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 1),
-                borderRadius: BorderRadius.circular(18),
-              ),
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color.fromRGBO(0, 0, 0, 0.25),
+                      offset: Offset(0, 2),
+                      blurRadius: 4,
+                      spreadRadius: 0,
+                    ),
+                  ]),
               child: Container(
-                margin: const EdgeInsets.only(
-                    top: 16, left: 22, bottom: 68),
+                margin: const EdgeInsets.only(top: 16, left: 22, bottom: 68),
                 child: Text(
                   _getCurrentDate(),
                   style: const TextStyle(
@@ -93,23 +103,22 @@ class NewMemoWidget extends StatelessWidget {
               height: 35,
               margin: const EdgeInsets.only(top: 5, left: 306),
               decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('lib/assets/tag.png'))),
+                  image:
+                      DecorationImage(image: AssetImage('lib/assets/tag.png'))),
             ),
             Container(
               width: 60,
               height: 70,
               margin: const EdgeInsets.only(top: 73, left: 281),
               decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('lib/assets/pen.png'))),
+                  image:
+                      DecorationImage(image: AssetImage('lib/assets/pen.png'))),
             ),
           ],
         ),
       ),
     );
   }
-
 }
 
 final Map<DateTime, int> heatmapData = {
@@ -119,7 +128,6 @@ final Map<DateTime, int> heatmapData = {
 };
 
 class MyHeatMap extends StatelessWidget {
-
   const MyHeatMap();
 
   @override
@@ -139,10 +147,12 @@ class MyHeatMap extends StatelessWidget {
           children: [
             GitHubHeatmap(
               startDate: DateTime.now().subtract(const Duration(days: 20 * 7)),
-              totalWeeks: 32, // 显示列
+              totalWeeks: 30,
+              // 显示列
               data: heatmapData,
-              cellSize: 9,    // 单元格size
-              spacing: 1 ,      // 间隔
+              cellSize: 9,
+              // 单元格size
+              spacing: 1, // 间隔
             )
           ],
         ),

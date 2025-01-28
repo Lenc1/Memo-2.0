@@ -84,7 +84,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 37, left: 150),
+                        margin: const EdgeInsets.only(top: 37, left: 150),
                         child: IconButton(
                           icon: Icon(_isEditing ? Icons.menu_book : Icons.edit),
                           onPressed: () {
@@ -99,7 +99,8 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                         child: ElevatedButton(
                           onPressed: _saveDiary,
                           style: ElevatedButton.styleFrom(
-                            primary: const Color.fromRGBO(64, 185, 222, 1),
+                            backgroundColor:
+                                const Color.fromRGBO(64, 185, 222, 1),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 17, vertical: 2),
                             shape: RoundedRectangleBorder(
@@ -109,6 +110,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                           child: const Text(
                             '保存',
                             style: TextStyle(
+                              fontFamily: 'SourceHanSans',
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -119,21 +121,31 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                   ),
                   Container(
                     margin: const EdgeInsets.only(
-                        top: 12, left: 51, right: 51, bottom: 12),
+                        top: 12, left: 51, right: 51),
                     child: const TextField(
                       maxLines: 1,
                       style: TextStyle(
+                        fontFamily: 'SourceHanSans',
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: Color.fromRGBO(46, 46, 46, 1),
                       ),
                       decoration: InputDecoration(
-                          hintText: '标题',
-                          hintStyle: TextStyle(
-                            color: Color.fromRGBO(189, 189, 189, 1),
-                          )),
+                        hintText: '标题',
+                        hintStyle: TextStyle(
+                          color: Color.fromRGBO(130, 130, 130, 1),
+                        ),
+                        border: InputBorder.none, //取消下划线
+                      ),
                     ),
                   ),
+                  Container(
+                      margin: EdgeInsets.only(left: 51,right: 51,bottom: 20),
+                      child: const Divider(
+                        height: 1,
+                        color: Color.fromRGBO(200, 200, 200, 1),
+                        thickness: 1,
+                      )),
                   Container(
                     margin: const EdgeInsets.only(left: 51, right: 51),
                     child: Column(
@@ -142,8 +154,9 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                             ? TextField(
                                 maxLines: 10,
                                 style: const TextStyle(
+                                  fontFamily: 'SourceHanSans',
                                   fontSize: 18,
-                                  fontWeight: FontWeight.normal,
+                                  fontWeight: FontWeight.w500,
                                   color: Color.fromRGBO(46, 46, 46, 1),
                                 ),
                                 controller: _controller,
@@ -155,7 +168,10 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                                 },
                                 decoration: const InputDecoration(
                                   hintText: '在此输入文字...',
-                                  // border: InputBorder.none, //取消下划线
+                                  hintStyle: TextStyle(
+                                    color: Color.fromRGBO(130, 130, 130, 1),
+                                  ),
+                                  border: InputBorder.none, //取消下划线
                                 ),
                                 // TODO: markdown显示
                               )
@@ -171,63 +187,108 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Row(
+                  Stack(
                     children: [
-                      Container(
-                        child: InkWell(
-                          onTap: () {
-                            print("picking Image...");
-                            _pickImages();
-                          },
-                          child: Container(
-                            width: 29,
-                            height: 29,
-                            margin: const EdgeInsets.only(left: 54),
-                            decoration: const BoxDecoration(
-                                image: DecorationImage(
-                                    image:
-                                        AssetImage('lib/assets/photos.png'))),
+                      const SizedBox(height: 150),
+                      if (_images.isNotEmpty) ...[
+                        const SizedBox(height: 40),
+                        const Text(
+                          '已选择的图片：',
+                          style: TextStyle(fontFamily: 'SourceHanSans'),
+                        ),
+                        Container(
+                          height: 82,
+                          margin: const EdgeInsets.symmetric(horizontal: 51),
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _images.length,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                width: 82,
+                                height: 82,
+                                margin: const EdgeInsets.symmetric(horizontal: 10),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: const[
+                                      BoxShadow(
+                                        color: Color.fromRGBO(0, 0, 0, 0.25),
+                                        offset: Offset(0, 2),
+                                        blurRadius: 4,
+                                        spreadRadius: 0,
+                                      )
+                                    ]
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    _images[index],
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      const Text(
-                        '上传照片...',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Color.fromRGBO(130, 130, 130, 1),
+                      ],
+                    ],
+                  ),
+
+                  const Divider(
+                    height: 1,
+                    color: Color.fromRGBO(200, 200, 200, 1),
+                    thickness: 1,
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          print("picking Image...");
+                          _pickImages();
+                        },
+                        child: Container(
+                          alignment: Alignment.topLeft,
+                          width: 150,
+                          margin: const EdgeInsets.only(top: 10, left: 51),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 29,
+                                height: 29,
+                                decoration: const BoxDecoration(
+                                    image: DecorationImage(
+                                        image: AssetImage(
+                                            'lib/assets/photos.png'))),
+                              ),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              _images.isEmpty
+                                  ? const Text(
+                                      '上传照片',
+                                      style: TextStyle(
+                                        fontFamily: 'SourceHanSans',
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color.fromRGBO(130, 130, 130, 1),
+                                      ),
+                                    )
+                                  : const Text(
+                                      '重新选择',
+                                      style: TextStyle(
+                                        fontFamily: 'SourceHanSans',
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color.fromRGBO(130, 130, 130, 1),
+                                      ),
+                                    ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  if (_images.isNotEmpty) ...[
-                    const Text('已选择的图片：'),
-                    SizedBox(
-                      height: 100,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _images.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 5.0),
-                            child: Image.file(
-                              _images[index],
-                              width: 80,
-                              height: 80,
-                              fit: BoxFit.cover,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 20),
                 ],
               ),
             ],
