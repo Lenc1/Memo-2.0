@@ -160,3 +160,27 @@ class MyHeatMap extends StatelessWidget {
     );
   }
 }
+class MemoBackButton extends StatelessWidget {
+  const MemoBackButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 22,
+      height: 20,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('lib/assets/back.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: InkWell(
+        onTap: () {
+          print("back");
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+}
+

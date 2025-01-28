@@ -2,9 +2,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:memo_program/styles/memo_style.dart';
+import 'package:memo_program/widgets/user_widget.dart';
 import 'package:window_manager/window_manager.dart';
 import 'pages/new_diary.dart';
-import 'models/memo_weiget.dart';
+import 'models/memo_widget.dart';
+import 'pages/check_memo.dart';
 
 import 'pages/profile.dart';
 
@@ -94,10 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
             width: 392,
             height: 307,
             margin: const EdgeInsets.only(top: 22, right: 26, left: 26),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
+            decoration: MemoStyle.cardDecoration,
             child: Column(
               children: [
                 Container(
@@ -117,45 +117,25 @@ class _MyHomePageState extends State<MyHomePage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Container(
-                          width: 61,
-                          height: 61,
                           margin: const EdgeInsets.only(
                               top: 6, left: 8, right: 14, bottom: 7),
-                          decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: AssetImage('lib/assets/avator.jpg'),
-                                fit: BoxFit.cover,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color.fromRGBO(0, 0, 0, 0.25),
-                                  offset: Offset(0, 2),
-                                  blurRadius: 4,
-                                  spreadRadius: 0,
-                                ),
-                              ]),
+                          child: const UserAvatar(),
                         ),
                         Container(
                           alignment: Alignment.topLeft,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              SizedBox(
+                            children:  [
+                              const SizedBox(
                                 height: 10,
                               ),
-                              Text(
-                                'Lenci',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(41, 41, 41, 1),
-                                ),
-                              ),
-                              SizedBox(
+                              UserName(style: MemoStyle.titleTextStyle.copyWith(
+                                fontWeight: FontWeight.w900,
+                              )),
+                              const SizedBox(
                                 height: 4,
                               ),
-                              Text(
+                              const Text(
                                 '已使用 Memo 280 天',
                                 style: TextStyle(
                                   fontFamily: 'SourceHanSans',
@@ -180,7 +160,6 @@ class _MyHomePageState extends State<MyHomePage> {
           const SizedBox(height: 16),
           const MyHeatMap(),
           Expanded(
-            // TODO: 日记列表美化
             child: ListView.builder(
               itemCount: _diaries.length,
               itemBuilder: (context, index) {
@@ -194,16 +173,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     height: 156,
                     margin:
                         const EdgeInsets.only(bottom: 16, left: 20, right: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                    decoration: MemoStyle.cardDecoration,
                     child: GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DiaryDetailPage(diary: diary),
+                            builder: (context) => MemoCheckPage(diary: diary),
                           ),
                         );
                       },
@@ -214,7 +190,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  DiaryDetailPage(diary: diary),
+                                  MemoCheckPage(diary: diary),
                             ),
                           );
                         },
@@ -256,13 +232,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               margin: const EdgeInsets.only(top: 16, left: 260),
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Color.fromRGBO(0, 0, 0, 0.25),
-                                      offset: Offset(0, 2),
-                                      blurRadius: 4,
-                                      spreadRadius: 0,
-                                    ),
+                                  boxShadow: [
+                                    MemoStyle.cardShadow,
                                   ]),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
@@ -287,51 +258,4 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class DiaryDetailPage extends StatelessWidget {
-  final DiaryEntry diary;
 
-  const DiaryDetailPage({super.key, required this.diary});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('日记详情'),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            Text(
-              diary.content,
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 20),
-            if (diary.images.isNotEmpty) ...[
-              const Text('日记图片：'),
-              SizedBox(
-                height: 100,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: diary.images.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                      child: Image.file(
-                        diary.images[index],
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}

@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:memo_program/models/memo_widget.dart';
 import 'dart:io';
+import 'package:memo_program/styles/memo_style.dart';
 
 class NewDiaryPage extends StatefulWidget {
   const NewDiaryPage({super.key});
@@ -49,40 +51,30 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(240, 251, 255, 1),
+      backgroundColor: MemoStyle.memoBackGroundColor,
       body: Align(
         alignment: Alignment.topCenter,
         child: Container(
           width: 392,
           height: 700,
           margin: const EdgeInsets.only(top: 22, left: 10, right: 10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
+          decoration: MemoStyle.cardDecoration,
           child: Column(
             children: [
               Column(
                 children: <Widget>[
                   Row(
                     children: [
-                      InkWell(
-                        onTap: () {
-                          print("back");
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          width: 22,
-                          height: 20,
+                        Container(
                           margin: const EdgeInsets.only(top: 37, left: 54),
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('lib/assets/back.png'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                          child:InkWell(
+                              onTap: () {
+                                print("back");
+                                Navigator.pop(context);
+                              },
+                            child: const MemoBackButton(),
+                          )
                         ),
-                      ),
                       Container(
                         margin: const EdgeInsets.only(top: 37, left: 150),
                         child: IconButton(
@@ -120,17 +112,11 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                     ],
                   ),
                   Container(
-                    margin: const EdgeInsets.only(
-                        top: 12, left: 51, right: 51),
-                    child: const TextField(
+                    margin: const EdgeInsets.only(top: 12, left: 51, right: 51),
+                    child:  TextField(
                       maxLines: 1,
-                      style: TextStyle(
-                        fontFamily: 'SourceHanSans',
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Color.fromRGBO(46, 46, 46, 1),
-                      ),
-                      decoration: InputDecoration(
+                      style: MemoStyle.titleTextStyle,
+                      decoration: const InputDecoration(
                         hintText: '标题',
                         hintStyle: TextStyle(
                           color: Color.fromRGBO(130, 130, 130, 1),
@@ -140,7 +126,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                     ),
                   ),
                   Container(
-                      margin: EdgeInsets.only(left: 51,right: 51,bottom: 20),
+                      margin: EdgeInsets.only(left: 51, right: 51, bottom: 20),
                       child: const Divider(
                         height: 1,
                         color: Color.fromRGBO(200, 200, 200, 1),
@@ -153,12 +139,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                         _isEditing
                             ? TextField(
                                 maxLines: 10,
-                                style: const TextStyle(
-                                  fontFamily: 'SourceHanSans',
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color.fromRGBO(46, 46, 46, 1),
-                                ),
+                                style: MemoStyle.bodyTextStyle,
                                 controller: _controller,
                                 onChanged: (text) {
                                   setState(() {
@@ -166,11 +147,9 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                                     _inputText = text;
                                   });
                                 },
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   hintText: '在此输入文字...',
-                                  hintStyle: TextStyle(
-                                    color: Color.fromRGBO(130, 130, 130, 1),
-                                  ),
+                                  hintStyle: MemoStyle.bodyHintTextStyle,
                                   border: InputBorder.none, //取消下划线
                                 ),
                                 // TODO: markdown显示
@@ -206,18 +185,13 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                               return Container(
                                 width: 82,
                                 height: 82,
-                                margin: const EdgeInsets.symmetric(horizontal: 10),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
-                                    boxShadow: const[
-                                      BoxShadow(
-                                        color: Color.fromRGBO(0, 0, 0, 0.25),
-                                        offset: Offset(0, 2),
-                                        blurRadius: 4,
-                                        spreadRadius: 0,
-                                      )
-                                    ]
-                                ),
+                                    boxShadow: [
+                                      MemoStyle.cardShadow
+                                    ]),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: Image.file(
@@ -232,7 +206,6 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                       ],
                     ],
                   ),
-
                   const Divider(
                     height: 1,
                     color: Color.fromRGBO(200, 200, 200, 1),
@@ -264,25 +237,10 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                               const SizedBox(
                                 width: 8,
                               ),
-                              _images.isEmpty
-                                  ? const Text(
-                                      '上传照片',
-                                      style: TextStyle(
-                                        fontFamily: 'SourceHanSans',
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color.fromRGBO(130, 130, 130, 1),
-                                      ),
-                                    )
-                                  : const Text(
-                                      '重新选择',
-                                      style: TextStyle(
-                                        fontFamily: 'SourceHanSans',
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color.fromRGBO(130, 130, 130, 1),
-                                      ),
-                                    ),
+                              Text(
+                                _images.isEmpty ? '上传照片' : '重新选择',
+                                style: MemoStyle.bodyHintTextStyle,
+                              ),
                             ],
                           ),
                         ),
