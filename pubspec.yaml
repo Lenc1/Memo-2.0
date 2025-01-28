@@ -16,6 +16,10 @@ dependencies:
   flutter_heatmap_calendar: ^1.0.5
   provider: ^6.1.2
   flutter_markdown: ^0.6.13
+  simple_heatmap_calendar: ^0.4.0
+  table_calendar: ^3.0.9
+  heatmap_calendar: ^1.0.1
+  window_manager: ^0.3.7
 
 
 dev_dependencies:
@@ -33,5 +37,6 @@ flutter:
     - lib/assets/pen.png
     - lib/assets/back.png
     - lib/assets/photos.png
+    - lib/assets/backfile.png
 
 

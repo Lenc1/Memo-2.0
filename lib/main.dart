@@ -1,13 +1,25 @@
 // main.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
-import 'new_diary.dart';
-import 'dart:io';
+import 'package:flutter/rendering.dart';
+import 'package:window_manager/window_manager.dart';
+import 'pages/new_diary.dart';
+import 'models/memo_weiget.dart';
 
-void main() {
+import 'pages/profile.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+
+  windowManager.setSize(
+      const Size(470,800) //自定义窗口大小
+  );
+
+  windowManager.setResizable(false);
   runApp(const MyApp());
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -35,11 +47,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<DiaryEntry> _diaries = [];
   Map<DateTime, int> _data = {};
+
   @override
   void initState() {
     _initExampleData();
     super.initState();
   }
+
   void _initExampleData() {
     var rng = Random();
     var now = DateTime.now();
@@ -49,6 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _data[date] = rng.nextInt(6); // Random number between 0 and 5
     }
   }
+
   // 跳转到新建日记页面
   void _navigateToNewDiaryPage(BuildContext context) async {
     final newDiary = await Navigator.push(
@@ -61,14 +76,14 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
-  String _getCurrentDate() {
-    // 获取当前日期
-    DateTime now = DateTime.now();
 
-    // 格式化为字符串，格式为 YYYY-MM-DD
-    return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+  // 跳转到个人主页
+  void _navigateToProfilePage(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ProfilePage()),
+    );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,19 +93,14 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             width: 392,
             height: 307,
-            margin:
-                const EdgeInsets.only(top: 22,right: 26,left: 26),
+            margin: const EdgeInsets.only(top: 22, right: 26, left: 26),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
               children: [
-                GestureDetector(
-                  onTap: () {
-                    print('Contaner clicked!');
-                  },
-                  child: Container(
+                Container(
                     width: 253,
                     height: 73,
                     margin:
@@ -99,190 +109,163 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: const Color.fromRGBO(242, 242, 242, 1),
                       borderRadius: BorderRadius.circular(37),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 61,
-                          height: 61,
-                          margin: const EdgeInsets.only(
-                              top: 6, left: 8, right: 14, bottom: 7),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: AssetImage('lib/assets/avator.jpg'),
-                              fit: BoxFit.cover,
+                    child: InkWell(
+                      onTap: () {
+                        _navigateToProfilePage(context);
+                        print('Contaner clicked!');
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 61,
+                            height: 61,
+                            margin: const EdgeInsets.only(
+                                top: 6, left: 8, right: 14, bottom: 7),
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: AssetImage('lib/assets/avator.jpg'),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                        Container(
-                          alignment: Alignment.topLeft,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                'Lenci',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(41, 41, 41, 1),
+                          Container(
+                            alignment: Alignment.topLeft,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                SizedBox(
+                                  height: 10,
                                 ),
-                              ),
-                              SizedBox(
-                                height: 4,
-                              ),
-                              Text(
-                                '已使用 Memo 280 天',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color.fromRGBO(117, 117, 117, 1),
+                                Text(
+                                  'Lenci',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color.fromRGBO(41, 41, 41, 1),
+                                  ),
                                 ),
-                              ),
-                            ],
+                                SizedBox(
+                                  height: 4,
+                                ),
+                                Text(
+                                  '已使用 Memo 280 天',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color.fromRGBO(117, 117, 117, 1),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
                 const SizedBox(height: 24),
-                Container(
-                  width: 363,
-                  height: 156,
-                  margin: const EdgeInsets.only(right: 11, left: 12),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color.fromRGBO(0, 0, 0, 1),
-                        Color.fromRGBO(102, 102, 102, 1),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: GestureDetector (
-                    onTap: (){
-                      print('open');
-                      _navigateToNewDiaryPage(context);
-                  },
-                    child: Stack(
-                    alignment: Alignment.topLeft,
-                    children: [
-                      Container(
-                        width: 173,
-                        height: 54,
-                        margin: const EdgeInsets.only(left: 20, top: 48),
-                        decoration: BoxDecoration(
-                          color: const Color.fromRGBO(156, 204, 219, 1),
-                          borderRadius: BorderRadius.circular(27),
-                        ),
-                        child: Container(
-                          margin: const EdgeInsets.only(left: 54, top: 16),
-                          child: const Text(
-                            '添加Memo',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 196,
-                        height: 130,
-                        margin: const EdgeInsets.only(
-                            top: 13, right: 12, left: 155, bottom: 13),
-                        decoration: BoxDecoration(
-                          color: const Color.fromRGBO(255, 255, 255, 1),
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: Container(
-                          margin: const EdgeInsets.only(
-                              top: 16, left: 22, bottom: 68),
-                          child: Text(
-                            _getCurrentDate(),
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 38,
-                        height: 38,
-                        margin: const EdgeInsets.only(top: 56, left: 32),
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('lib/assets/addition_fill.png'),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 35,
-                        height: 35,
-                        margin: const EdgeInsets.only(top: 5, left: 306),
-                        decoration: const BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('lib/assets/tag.png'))),
-                      ),
-                      Container(
-                        width: 60,
-                        height: 70,
-                        margin: const EdgeInsets.only(top: 73, left: 281),
-                        decoration: const BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('lib/assets/pen.png'))),
-                      ),
-                    ],
-                  ),
-                ),
-                ),
+                NewMemoWidget(
+                    onPressed: () => _navigateToNewDiaryPage(context)),
               ],
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            width: 392,
-            height: 120,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column( // TODO: 热力图
-                children: [
-                  const SizedBox(height: 30),
-
-                ],
-              ),
-            ),
-          ),
-          Expanded( // TODO: 日记列表美化
+          const MyHeatMap(),
+          Expanded(
+            // TODO: 日记列表美化
             child: ListView.builder(
               itemCount: _diaries.length,
               itemBuilder: (context, index) {
                 final diary = _diaries[index];
-                return ListTile(
-                  title: Text('日记 #${index + 1}'),
-                  subtitle: Text(diary.content),
-                  onTap: () {
-                    // 查看日记详细内容
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DiaryDetailPage(diary: diary),
+                return Align(
+                  // 使用 Align 来控制宽度
+                  alignment: Alignment.center, // 将容器居中
+                  child: Container(
+                    width: 392,
+                    // 固定宽度
+                    height: 156,
+                    margin:
+                        const EdgeInsets.only(bottom: 16, left: 20, right: 20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [], // 取消阴影
+                    ),
+                    child: GestureDetector(
+                      onTap: () {
+                        // 查看日记详细内容
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DiaryDetailPage(diary: diary),
+                          ),
+                        );
+                      },
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  DiaryDetailPage(diary: diary),
+                            ),
+                          );
+                        },
+                        child: Stack(
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 29, left: 30),
+                              child: Text(
+                                '日记 #${index + 1}',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color.fromRGBO(74, 74, 74, 1),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  top: 58, left: 30, right: 144),
+                              child: const Divider(
+                                height: 1,
+                                color: Colors.grey,
+                                thickness: 1,
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(left: 31, top: 63),
+                              child: Text(
+                                diary.content.length > 10
+                                    ? diary.content.substring(0, 10) + '...'
+                                    : diary.content,
+                                maxLines: 1, // 限制为单行显示
+                                overflow: TextOverflow.ellipsis, // 超出部分用...表示
+                              ),
+                            ),
+                            Container(
+                              width: 82,
+                              height: 82,
+                              margin: const EdgeInsets.only(top: 37, left: 265),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                // 使图片也具有圆角
+                                child: Image.file(
+                                  diary.images[0],
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
                       ),
-                    );
-                  },
+                    ),
+                  ),
                 );
               },
             ),

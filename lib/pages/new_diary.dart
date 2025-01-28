@@ -23,7 +23,6 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
         _images = pickedFiles.map((e) => File(e.path)).toList();
       });
     } else {
-      // 提示最多选择3张图片
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('最多只能选择三张图片')),
       );
@@ -67,7 +66,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                 children: <Widget>[
                   Row(
                     children: [
-                      GestureDetector(
+                      InkWell(
                         onTap: () {
                           print("back");
                           Navigator.pop(context);
@@ -119,7 +118,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                     ],
                   ),
                   Container(
-                    margin: EdgeInsets.only(
+                    margin: const EdgeInsets.only(
                         top: 12, left: 51, right: 51, bottom: 12),
                     child: const TextField(
                       maxLines: 1,
@@ -136,7 +135,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(left: 51, right: 51),
+                    margin: const EdgeInsets.only(left: 51, right: 51),
                     child: Column(
                       children: [
                         _isEditing
@@ -173,34 +172,37 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: () {
-                      print("picking Image...");
-                      _pickImages();
-                    },
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 29,
-                          height: 29,
-                          margin: const EdgeInsets.only(left: 54),
-                          decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                  image: AssetImage('lib/assets/photos.png'))),
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        const Text(
-                          '上传照片...',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Color.fromRGBO(130, 130, 130, 1),
+                  Row(
+                    children: [
+                      Container(
+                        child: InkWell(
+                          onTap: () {
+                            print("picking Image...");
+                            _pickImages();
+                          },
+                          child: Container(
+                            width: 29,
+                            height: 29,
+                            margin: const EdgeInsets.only(left: 54),
+                            decoration: const BoxDecoration(
+                                image: DecorationImage(
+                                    image:
+                                        AssetImage('lib/assets/photos.png'))),
                           ),
-                        )
-                      ],
-                    ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      const Text(
+                        '上传照片...',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Color.fromRGBO(130, 130, 130, 1),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 20),
                   if (_images.isNotEmpty) ...[
