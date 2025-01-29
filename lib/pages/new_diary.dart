@@ -15,6 +15,7 @@ class NewDiaryPage extends StatefulWidget {
 
 class _NewDiaryPageState extends State<NewDiaryPage> {
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   List<File> _images = [];
 
@@ -30,14 +31,15 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       );
     }
   }
-
-  void _saveDiary() {
+  void _saveMemo() {
     if (_controller.text.isNotEmpty && _images.isNotEmpty) {
-      final newDiary = DiaryEntry(
+      final newMemo = Memo(
+        title: _titleController.text,
         content: _controller.text,
         images: _images,
+        created_at: DateTime.now().toIso8601String(),
       );
-      Navigator.pop(context, newDiary);
+      Navigator.pop(context, newMemo);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('请填写日记内容并选择图片')),
@@ -89,7 +91,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                       Container(
                         margin: const EdgeInsets.only(left: 20, top: 36),
                         child: ElevatedButton(
-                          onPressed: _saveDiary,
+                          onPressed: _saveMemo,
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 const Color.fromRGBO(64, 185, 222, 1),
@@ -116,6 +118,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                     child:  TextField(
                       maxLines: 1,
                       style: MemoStyle.titleTextStyle,
+                      controller: _titleController,
                       decoration: const InputDecoration(
                         hintText: '标题',
                         hintStyle: TextStyle(
@@ -170,23 +173,17 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                     children: [
                       const SizedBox(height: 150),
                       if (_images.isNotEmpty) ...[
-                        const SizedBox(height: 40),
-                        const Text(
-                          '已选择的图片：',
-                          style: TextStyle(fontFamily: 'SourceHanSans'),
-                        ),
                         Container(
-                          height: 82,
-                          margin: const EdgeInsets.symmetric(horizontal: 51),
+                          height: 95,
+                          margin: const EdgeInsets.only(top: 30,left: 31),
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: _images.length,
                             itemBuilder: (context, index) {
                               return Container(
-                                width: 82,
-                                height: 82,
+                                width: 95,
                                 margin:
-                                    const EdgeInsets.symmetric(horizontal: 10),
+                                    const EdgeInsets.symmetric(horizontal: 5),
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
                                     boxShadow: [
@@ -257,9 +254,11 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
   }
 }
 
-class DiaryEntry {
+class Memo {
+  String title;
   String content;
   List<File> images;
+  String created_at;
 
-  DiaryEntry({required this.content, required this.images});
+  Memo({required this.title, required this.content, required this.images, required this.created_at});
 }

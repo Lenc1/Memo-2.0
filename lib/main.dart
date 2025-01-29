@@ -1,10 +1,12 @@
 // main.dart
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:memo_program/styles/memo_style.dart';
 import 'package:memo_program/widgets/user_widget.dart';
 import 'package:window_manager/window_manager.dart';
+import 'config/memo_config.dart';
 import 'pages/new_diary.dart';
 import 'models/memo_widget.dart';
 import 'pages/check_memo.dart';
@@ -47,7 +49,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<DiaryEntry> _diaries = [];
+  List<Memo> _memo = [];
   Map<DateTime, int> _data = {};
 
   @override
@@ -74,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     if (newDiary != null) {
       setState(() {
-        _diaries.add(newDiary);
+        _memo.add(newDiary);
       });
     }
   }
@@ -98,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
             height: 307,
             margin: const EdgeInsets.only(top: 22, right: 26, left: 26),
             decoration: MemoStyle.cardDecoration,
-            child: Column(
+            child: Stack(
               children: [
                 Container(
                   width: 253,
@@ -125,11 +127,12 @@ class _MyHomePageState extends State<MyHomePage> {
                           alignment: Alignment.topLeft,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children:  [
+                            children: [
                               const SizedBox(
                                 height: 10,
                               ),
-                              UserName(style: MemoStyle.titleTextStyle.copyWith(
+                              UserName(
+                                  style: MemoStyle.titleTextStyle.copyWith(
                                 fontWeight: FontWeight.w900,
                               )),
                               const SizedBox(
@@ -151,25 +154,53 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ),
+                Container(
+                  margin: const EdgeInsets.only(top: 65, left: 320),
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: MemoConfig.showHeatMap,
+                    builder: (context, showHeatMap, child) {
+                      return IconButton(
+                        onPressed: () {
+                          // 切换 showHeatMap 状态
+                          MemoConfig.toggleHeatMap();
+                        },
+                        icon: Icon(
+                          showHeatMap ? Icons.vertical_align_top : Icons.vertical_align_bottom,
+                        ),
+                      );
+                    },
+                  ),
+                ),
                 const SizedBox(height: 24),
-                NewMemoWidget(
-                    onPressed: () => _navigateToNewDiaryPage(context)),
+                Container(
+                  margin: EdgeInsets.only(top: 127),
+                  child: NewMemoWidget(
+                      onPressed: () => _navigateToNewDiaryPage(context)),
+                )
               ],
             ),
           ),
           const SizedBox(height: 16),
-          const MyHeatMap(),
+          ValueListenableBuilder(
+              valueListenable: MemoConfig.showHeatMap,
+              builder: (context, showHeatMap, child) {
+                if (showHeatMap) {
+                  return const MyHeatMap();
+                }
+                else{
+                  return Container();
+                }
+              },
+              ),
           Expanded(
             child: ListView.builder(
-              itemCount: _diaries.length,
+              itemCount: _memo.length,
               itemBuilder: (context, index) {
-                final diary = _diaries[index];
+                final memo = _memo[_memo.length - index - 1];
                 return Align(
-                  // 使用 Align 来控制宽度
-                  alignment: Alignment.center, // 将容器居中
+                  alignment: Alignment.center,
                   child: Container(
                     width: 392,
-                    // 固定宽度
                     height: 156,
                     margin:
                         const EdgeInsets.only(bottom: 16, left: 20, right: 20),
@@ -179,7 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MemoCheckPage(diary: diary),
+                            builder: (context) => MemoCheckPage(memo: memo),
                           ),
                         );
                       },
@@ -189,8 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  MemoCheckPage(diary: diary),
+                              builder: (context) => MemoCheckPage(memo: memo),
                             ),
                           );
                         },
@@ -199,11 +229,12 @@ class _MyHomePageState extends State<MyHomePage> {
                             Container(
                               margin: const EdgeInsets.only(top: 29, left: 30),
                               child: Text(
-                                '日记 #${index + 1}',
-                                style: const TextStyle(
+                                memo.title.length > 10
+                                    ? '${memo.title.substring(0, 10)}...'
+                                    : memo.title,
+                                overflow: TextOverflow.ellipsis,
+                                style: MemoStyle.titleTextStyle.copyWith(
                                   fontSize: 18,
-                                  fontWeight: FontWeight.w900,
-                                  color: Color.fromRGBO(74, 74, 74, 1),
                                 ),
                               ),
                             ),
@@ -219,11 +250,23 @@ class _MyHomePageState extends State<MyHomePage> {
                             Container(
                               margin: const EdgeInsets.only(left: 31, top: 63),
                               child: Text(
-                                diary.content.length > 10
-                                    ? '${diary.content.substring(0, 10)}...'
-                                    : diary.content,
+                                memo.content.length > 10
+                                    ? '${memo.content.substring(0, 10)}...'
+                                    : memo.content,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
+                                style: MemoStyle.bodyTextStyle.copyWith(
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 105, left: 31),
+                              child: Text(
+                                memo.created_at.substring(0, 10),
+                                style: MemoStyle.bodyHintTextStyle.copyWith(
+                                  fontSize: 13,
+                                ),
                               ),
                             ),
                             Container(
@@ -238,7 +281,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.file(
-                                  diary.images[0],
+                                  memo.images[0],
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -257,5 +300,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-

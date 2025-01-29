@@ -1,7 +1,6 @@
 // my_button.dart
 import 'package:flutter/material.dart';
 import 'heat_map.dart';
-import '../pages/new_diary.dart';
 
 class NewMemoWidget extends StatelessWidget {
   String _getCurrentDate() {

@@ -4,9 +4,9 @@ import 'package:memo_program/styles/memo_style.dart';
 import '../pages/new_diary.dart';
 
 class MemoCheckPage extends StatelessWidget {
-  final DiaryEntry diary;
+  final Memo memo;
 
-  const MemoCheckPage({super.key, required this.diary});
+  const MemoCheckPage({super.key, required this.memo});
 
   @override
   Widget build(BuildContext context) {
@@ -21,43 +21,87 @@ class MemoCheckPage extends StatelessWidget {
           decoration: MemoStyle.cardDecoration,
           child: Stack(
             children: [
-                 Container(
-                  margin: const EdgeInsets.only(top: 37, left: 54),
-                  child: InkWell(onTap: () {
-                    print("back");
-                    Navigator.pop(context);
-                  },
-                    child: const MemoBackButton(),),
-                ),
+              Row(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 37, left: 54),
+                    child: InkWell(
+                      onTap: () {
+                        print("back");
+                        Navigator.pop(context);
+                      },
+                      child: const MemoBackButton(),
+                    ),
+                  ),
+                  Container(
+                      margin: const EdgeInsets.only(top: 37, left: 230),
+                      child: IconButton(
+                        icon: const Icon(Icons.mode_edit_outline_outlined),
+                        color: const Color.fromRGBO(40, 40, 40, 1),
+                        onPressed: () {},
+                      )),
+                ],
+              ),
               Container(
-                margin: EdgeInsets.only(top: 20),
+                margin: const EdgeInsets.only(top: 90, left: 51),
                 child: Text(
-                  diary.content,
-                  style: const TextStyle(fontSize: 18),
+                  memo.title,
+                  style: MemoStyle.titleTextStyle,
                 ),
               ),
-              // const SizedBox(height: 20),
-              // if (diary.images.isNotEmpty) ...[
-              //   const Text('日记图片：'),
-              //   SizedBox(
-              //     height: 100,
-              //     child: ListView.builder(
-              //       scrollDirection: Axis.horizontal,
-              //       itemCount: diary.images.length,
-              //       itemBuilder: (context, index) {
-              //         return Padding(
-              //           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-              //           child: Image.file(
-              //             diary.images[index],
-              //             width: 80,
-              //             height: 80,
-              //             fit: BoxFit.cover,
-              //           ),
-              //         );
-              //       },
-              //     ),
-              //   ),
-              //],
+              Container(
+                  margin: const EdgeInsets.only(
+                      top: 128, left: 51, right: 51, bottom: 20),
+                  child: const Divider(
+                    height: 1,
+                    color: Color.fromRGBO(200, 200, 200, 1),
+                    thickness: 1,
+                  )),
+              Container(
+                margin: const EdgeInsets.only(top: 156, left: 51),
+                child: Text(
+                  memo.content,
+                  maxLines: 15,
+                  style: MemoStyle.bodyTextStyle,
+                ),
+              ),
+              Container(
+                height: 100,
+                margin: const EdgeInsets.only(top: 580, left: 31),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal, // 横向滚动显示
+                    itemCount: memo.images.length,  // 动态获取图片数量
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: 100,
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [MemoStyle.cardShadow],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            memo.images[index],  // 显示所有图片
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 560),
+                child: const Divider(
+                  height: 1,
+                  color: Color.fromRGBO(200, 200, 200, 1),
+                  thickness: 1,
+                ),
+              ),
             ],
           ),
         ),
