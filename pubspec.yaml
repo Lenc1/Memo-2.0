@@ -20,6 +20,8 @@ dependencies:
   table_calendar: ^3.0.9
   heatmap_calendar: ^1.0.1
   window_manager: ^0.3.7
+  file_picker: ^5.0.1
+  path_provider: ^2.0.11
 
 
 dev_dependencies:

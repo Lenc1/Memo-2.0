@@ -1,10 +1,14 @@
-// new_diary.dart
+// add_memo.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memo_program/models/memo_widget.dart';
 import 'dart:io';
 import 'package:memo_program/styles/memo_style.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
+
+import '../models/memo.dart';
 
 class NewDiaryPage extends StatefulWidget {
   const NewDiaryPage({super.key});
@@ -23,7 +27,9 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
     final pickedFiles = await _picker.pickMultiImage();
     if (pickedFiles != null && pickedFiles.length <= 3) {
       setState(() {
-        _images = pickedFiles.map((e) => File(e.path)).toList();
+        _images = pickedFiles.map((e) {
+          return File(e.path);
+        }).toList();
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -31,7 +37,9 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       );
     }
   }
-  void _saveMemo() {
+
+
+  void _saveMemo() async{
     if (_controller.text.isNotEmpty && _images.isNotEmpty) {
       final newMemo = Memo(
         title: _titleController.text,
@@ -39,10 +47,17 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
         images: _images,
         created_at: DateTime.now().toIso8601String(),
       );
+      final directory = await getApplicationDocumentsDirectory();
+      final file = File('${directory.path}/memo_${DateTime.now().millisecondsSinceEpoch}.json');
+      final memoJson = jsonEncode(newMemo.toJson());
+      await file.writeAsString(memoJson);
+      print(directory.path);
       Navigator.pop(context, newMemo);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请填写日记内容并选择图片')),
+        SnackBar(content: Text('请填写日记内容并至少选择一张图片',style: MemoStyle.bodyTextStyle.copyWith(
+          color: Colors.white,
+        ),)),
       );
     }
   }
@@ -58,8 +73,8 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
         alignment: Alignment.topCenter,
         child: Container(
           width: 392,
-          height: 700,
-          margin: const EdgeInsets.only(top: 22, left: 10, right: 10),
+          height: double.infinity,
+          margin: const EdgeInsets.only(top: 50),
           decoration: MemoStyle.cardDecoration,
           child: Column(
             children: [
@@ -67,15 +82,14 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                 children: <Widget>[
                   Row(
                     children: [
-                        Container(
-                          margin: const EdgeInsets.only(top: 37, left: 54),
-                          child:InkWell(
-                              onTap: () {
-                                print("back");
-                                Navigator.pop(context);
-                              },
-                            child: const MemoBackButton(),
-                          )
+                      InkWell(onTap: () {
+                        print("back");
+                        Navigator.pop(context);
+                      },
+                        child: Container(
+                            margin: const EdgeInsets.only(top: 37, left: 54),
+                              child: const MemoBackButton(),
+                            )
                         ),
                       Container(
                         margin: const EdgeInsets.only(top: 37, left: 150),
@@ -95,18 +109,17 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 const Color.fromRGBO(64, 185, 222, 1),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 17, vertical: 2),
+                            padding: const EdgeInsets.only(left: 17,right: 17),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             '保存',
-                            style: TextStyle(
-                              fontFamily: 'SourceHanSans',
+                            style: MemoStyle.bodyTextStyle.copyWith(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
+                              color: Colors.white,
                             ),
                           ),
                         ),
@@ -115,7 +128,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                   ),
                   Container(
                     margin: const EdgeInsets.only(top: 12, left: 51, right: 51),
-                    child:  TextField(
+                    child: TextField(
                       maxLines: 1,
                       style: MemoStyle.titleTextStyle,
                       controller: _titleController,
@@ -128,9 +141,9 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                       ),
                     ),
                   ),
-                  Container(
-                      margin: EdgeInsets.only(left: 51, right: 51, bottom: 20),
-                      child: const Divider(
+                  const Positioned(
+                      left: 51, right: 51, bottom: 20,
+                      child: Divider(
                         height: 1,
                         color: Color.fromRGBO(200, 200, 200, 1),
                         thickness: 1,
@@ -159,23 +172,23 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                               )
                             : Expanded(
                                 child: SingleChildScrollView(
-                                child: Markdown(
-                                  data: _inputText,
-                                  styleSheet: MarkdownStyleSheet(
-                                    h1: TextStyle(fontSize: 14),
-                                  ),
-                                ),
+                                // child: Markdown(
+                                //   data: _inputText,
+                                //   styleSheet: MarkdownStyleSheet(
+                                //     h1: TextStyle(fontSize: 14),
+                                //   ),
+                                // ),
                               ))
                       ],
                     ),
                   ),
                   Stack(
                     children: [
-                      const SizedBox(height: 150),
+                      ClipRRect(child: const SizedBox(height: 150),),
                       if (_images.isNotEmpty) ...[
                         Container(
                           height: 95,
-                          margin: const EdgeInsets.only(top: 30,left: 31),
+                          margin: const EdgeInsets.only(top: 30, left: 31),
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: _images.length,
@@ -186,9 +199,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                                     const EdgeInsets.symmetric(horizontal: 5),
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      MemoStyle.cardShadow
-                                    ]),
+                                    boxShadow: [MemoStyle.cardShadow]),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: Image.file(
@@ -252,13 +263,4 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       ),
     );
   }
-}
-
-class Memo {
-  String title;
-  String content;
-  List<File> images;
-  String created_at;
-
-  Memo({required this.title, required this.content, required this.images, required this.created_at});
 }

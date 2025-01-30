@@ -16,10 +16,10 @@ class GitHubHeatmap extends StatelessWidget {
     this.spacing = 2,
     this.colorLevels = const [
       Color(0xFFEBEDF0), // 等级0
-      Color(0xFF9BE9A8), // 等级1
-      Color(0xFF40C463), // 等级2
-      Color(0xFF30A14E), // 等级3
-      Color(0xFF216E39), // 等级4
+      Color.fromRGBO(197, 232, 231, 1), // 等级1
+      Color.fromRGBO(160, 216, 219, 1), // 等级2
+      Color.fromRGBO(91, 171, 170, 1), // 等级3
+      Color.fromRGBO(52, 125, 124, 1), // 等级4
     ],
     Key? key,
   }) : super(key: key);

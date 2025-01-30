@@ -14,7 +14,6 @@ class NewMemoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Container(
       width: 363,
       height: 156,
@@ -119,6 +118,14 @@ class NewMemoWidget extends StatelessWidget {
     );
   }
 }
+class DeleteMemoWidget extends StatelessWidget {
+  const DeleteMemoWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
+}
 
 final Map<DateTime, int> heatmapData = {
   DateTime.now().subtract(Duration(days: 5)): 2,
@@ -134,7 +141,7 @@ class MyHeatMap extends StatelessWidget {
     return Container(
       width: 392,
       height: 130,
-      margin: EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 16), //安卓和windows有差异
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -152,7 +159,7 @@ class MyHeatMap extends StatelessWidget {
               cellSize: 9,
               // 单元格size
               spacing: 1, // 间隔
-            )
+            ),
           ],
         ),
       ),

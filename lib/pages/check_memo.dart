@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:memo_program/models/memo_widget.dart';
 import 'package:memo_program/styles/memo_style.dart';
-import '../pages/new_diary.dart';
+
+import '../models/memo.dart';
+
 
 class MemoCheckPage extends StatelessWidget {
   final Memo memo;
@@ -17,7 +19,7 @@ class MemoCheckPage extends StatelessWidget {
         child: Container(
           width: 392,
           height: 700,
-          margin: const EdgeInsets.only(top: 22, left: 10, right: 10),
+          margin: const EdgeInsets.only(top: 50),
           decoration: MemoStyle.cardDecoration,
           child: Stack(
             children: [

@@ -1,13 +1,16 @@
 // main.dart
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:memo_program/styles/memo_style.dart';
 import 'package:memo_program/widgets/user_widget.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'config/memo_config.dart';
-import 'pages/new_diary.dart';
+import 'models/memo.dart';
+import 'pages/add_memo.dart';
 import 'models/memo_widget.dart';
 import 'pages/check_memo.dart';
 
@@ -15,12 +18,26 @@ import 'pages/profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
-
-  windowManager.setSize(const Size(470, 800) //自定义窗口大小
-      );
-
+  // await windowManager.ensureInitialized();
+  //
+  // windowManager.setSize(const Size(470, 800) //自定义窗口大小
+  //     );
+  if(window.physicalSize.isEmpty){
+    window.onMetricsChanged = (){
+      //在回调中，size仍然有可能是0
+      if(!window.physicalSize.isEmpty){
+        window.onMetricsChanged = null;
+        runMyAPP();
+      }
+    };
+  } else{
+    //如果size非0，则直接runApp
+    runMyAPP();
+  };
   windowManager.setResizable(false);
+}
+
+void runMyAPP() {
   runApp(const MyApp());
 }
 
@@ -49,15 +66,36 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Memo> _memo = [];
-  Map<DateTime, int> _data = {};
+  final List<Memo> _memo = [];
+  final Map<DateTime, int> _data = {};
 
   @override
   void initState() {
     _initExampleData();
+    _loadSavedMemos();
     super.initState();
   }
+  Future<void> _loadSavedMemos() async{
+    final directory = await getApplicationDocumentsDirectory();
+    final dir = Directory(directory.path);
+    final files = await dir.list()
+        .where((file) => file.path.endsWith('.json') && file.path.contains('memo_'))
+        .toList();
 
+    for (var file in files) {
+      final content = await File(file.path).readAsString();
+      final json = jsonDecode(content);
+      final memo = Memo.fromJson(json);
+
+      // 检查是否已存在相同内容的备忘录（可选）
+      if (!_memo.any((m) => m.created_at == memo.created_at)) {
+        setState(() {
+          _memo.add(memo);
+        });
+      }
+    }
+    _memo.sort((a, b) => b.created_at.compareTo(a.created_at));
+  }
   void _initExampleData() {
     var rng = Random();
     var now = DateTime.now();
@@ -98,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             width: 392,
             height: 307,
-            margin: const EdgeInsets.only(top: 22, right: 26, left: 26),
+            margin: const EdgeInsets.only(top: 50),
             decoration: MemoStyle.cardDecoration,
             child: Stack(
               children: [
@@ -113,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: InkWell(
                     onTap: () {
                       _navigateToProfilePage(context);
-                      print('Contaner clicked!');
+                      print("State Changed");
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -135,9 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   style: MemoStyle.titleTextStyle.copyWith(
                                 fontWeight: FontWeight.w900,
                               )),
-                              const SizedBox(
-                                height: 4,
-                              ),
+                              const SizedBox(height: 4,),
                               const Text(
                                 '已使用 Memo 280 天',
                                 style: TextStyle(
@@ -173,7 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 const SizedBox(height: 24),
                 Container(
-                  margin: EdgeInsets.only(top: 127),
+                  margin: const EdgeInsets.only(top: 127),
                   child: NewMemoWidget(
                       onPressed: () => _navigateToNewDiaryPage(context)),
                 )
@@ -198,12 +234,11 @@ class _MyHomePageState extends State<MyHomePage> {
               itemBuilder: (context, index) {
                 final memo = _memo[_memo.length - index - 1];
                 return Align(
-                  alignment: Alignment.center,
+                  alignment: Alignment.topCenter,
                   child: Container(
                     width: 392,
                     height: 156,
-                    margin:
-                        const EdgeInsets.only(bottom: 16, left: 20, right: 20),
+                    margin: const EdgeInsets.only(bottom: 16,),
                     decoration: MemoStyle.cardDecoration,
                     child: GestureDetector(
                       onTap: () {
@@ -272,7 +307,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Container(
                               width: 115,
                               height: 115,
-                              margin: const EdgeInsets.only(top: 16, left: 260),
+                              margin: const EdgeInsets.only(top: 16, left: 250),
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   boxShadow: [
