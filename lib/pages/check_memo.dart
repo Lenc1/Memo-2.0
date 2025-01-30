@@ -1,14 +1,28 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:memo_program/models/memo_widget.dart';
+import 'package:memo_program/pages/add_memo.dart';
+import 'package:memo_program/widgets/memo_widget.dart';
 import 'package:memo_program/styles/memo_style.dart';
-
+import 'package:memo_program/services/memo_services.dart';
 import '../models/memo.dart';
 
-
-class MemoCheckPage extends StatelessWidget {
+class MemoCheckPage extends StatefulWidget {
   final Memo memo;
 
-  const MemoCheckPage({super.key, required this.memo});
+  MemoCheckPage({super.key, required this.memo});
+
+  @override
+  _MemoCheckPageState createState() => _MemoCheckPageState();
+}
+
+class _MemoCheckPageState extends State<MemoCheckPage> {
+  late Memo memo;
+
+  @override
+  void initState() {
+    super.initState();
+    memo = widget.memo; // 获取传递的 memo 数据
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,35 +50,60 @@ class MemoCheckPage extends StatelessWidget {
                     ),
                   ),
                   Container(
-                      margin: const EdgeInsets.only(top: 37, left: 230),
-                      child: IconButton(
-                        icon: const Icon(Icons.mode_edit_outline_outlined),
-                        color: const Color.fromRGBO(40, 40, 40, 1),
-                        onPressed: () {},
-                      )),
+                    margin: const EdgeInsets.only(top: 37, left: 230),
+                    child: IconButton(
+                      icon: const Icon(Icons.mode_edit_outline_outlined),
+                      color: const Color.fromRGBO(40, 40, 40, 1),
+                      onPressed: () async {
+                        final newMemo = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NewDiaryPage(memo: memo),
+                          ),
+                        );
+                        if (newMemo != null) {
+                          setState(() {
+                            memo = newMemo; // 更新 memo 并刷新 UI
+                          });
+                        }
+                      },
+                    ),
+                  ),
                 ],
               ),
-              Container(
-                margin: const EdgeInsets.only(top: 90, left: 51),
-                child: Text(
+              Positioned( //标题
+                top: 90, left: 51, right: 51,
+                child: SizedBox(width: 250,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                child:Text(
                   memo.title,
                   style: MemoStyle.titleTextStyle,
                 ),
+              ),),),
+              Container(//标题下面的线
+                margin: const EdgeInsets.only(top: 128, left: 51, right: 51, bottom: 20,),
+                child: const Divider(
+                  height: 1,
+                  color: Color.fromRGBO(200, 200, 200, 1),
+                  thickness: 1,
+                ),
               ),
-              Container(
-                  margin: const EdgeInsets.only(
-                      top: 128, left: 51, right: 51, bottom: 20),
-                  child: const Divider(
-                    height: 1,
-                    color: Color.fromRGBO(200, 200, 200, 1),
-                    thickness: 1,
-                  )),
-              Container(
-                margin: const EdgeInsets.only(top: 156, left: 51),
-                child: Text(
-                  memo.content,
-                  maxLines: 15,
-                  style: MemoStyle.bodyTextStyle,
+              Positioned(
+                top: 80,
+                left: 305,
+                child: DeleteMemoWidget(memo: memo),
+              ),
+              Positioned(
+                top: 156, left: 51, right: 51,
+                child: SizedBox(
+                  height: 360, // 限制滚动区域
+                  child: SingleChildScrollView(
+                    child: Text(
+                      memo.content,
+                      style: MemoStyle.bodyTextStyle,
+                    ),
+                  ),
                 ),
               ),
               Container(
@@ -74,8 +113,8 @@ class MemoCheckPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   child: ListView.builder(
                     shrinkWrap: true,
-                    scrollDirection: Axis.horizontal, // 横向滚动显示
-                    itemCount: memo.images.length,  // 动态获取图片数量
+                    scrollDirection: Axis.horizontal,
+                    itemCount: memo.images.length,
                     itemBuilder: (context, index) {
                       return Container(
                         width: 100,
@@ -87,7 +126,7 @@ class MemoCheckPage extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Image.file(
-                            memo.images[index],  // 显示所有图片
+                            File(memo.images[index]), // 显示所有图片
                             fit: BoxFit.cover,
                           ),
                         ),

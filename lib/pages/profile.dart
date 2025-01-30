@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memo_program/widgets/user_widget.dart';
 
-import '../models/memo_widget.dart';
+import '../widgets/memo_widget.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

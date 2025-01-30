@@ -1,6 +1,10 @@
-// my_button.dart
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'heat_map.dart';
+import '../models/heat_map.dart';
+import '../models/memo.dart';
+import '../services/memo_services.dart';
+import '../styles/memo_style.dart';
 
 class NewMemoWidget extends StatelessWidget {
   String _getCurrentDate() {
@@ -8,7 +12,7 @@ class NewMemoWidget extends StatelessWidget {
     return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
   }
 
-  const NewMemoWidget({required this.onPressed});
+  const NewMemoWidget({super.key,required this.onPressed});
 
   final VoidCallback onPressed;
 
@@ -118,12 +122,135 @@ class NewMemoWidget extends StatelessWidget {
     );
   }
 }
-class DeleteMemoWidget extends StatelessWidget {
-  const DeleteMemoWidget({super.key});
+
+class MemoListViewBuilder extends StatelessWidget {
+  final List<Memo> memos;
+  final void Function(Memo) onPressed;
+  const MemoListViewBuilder({super.key,required this.memos, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return ListView.builder(
+      itemCount: memos.length,
+      itemBuilder: (context, index) {
+        final memo = memos[memos.length - index - 1];
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            width: 392,
+            height: 156,
+            margin: const EdgeInsets.only(bottom: 16,),
+            decoration: MemoStyle.cardDecoration,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () {
+                  onPressed(memo);
+                },
+                child: Stack(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 29, left: 30),
+                      child: Text(
+                        memo.title.length > 10
+                            ? '${memo.title.substring(0, 10)}...'
+                            : memo.title,
+                        overflow: TextOverflow.ellipsis,
+                        style: MemoStyle.titleTextStyle.copyWith(
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(
+                          top: 58, left: 30, right: 144),
+                      child: const Divider(
+                        height: 1,
+                        color: Colors.grey,
+                        thickness: 1,
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(left: 31, top: 63),
+                      child: Text(
+                        memo.content.length > 10
+                            ? '${memo.content.substring(0, 10)}...'
+                            : memo.content,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: MemoStyle.bodyTextStyle.copyWith(
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 105, left: 31),
+                      child: Text(
+                        memo.created_at.substring(0, 10),
+                        style: MemoStyle.bodyHintTextStyle.copyWith(
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 115,
+                      height: 115,
+                      margin: const EdgeInsets.only(top: 16, left: 250),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [MemoStyle.cardShadow,]),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          File(memo.images[0]),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+        );
+      },
+    );
+  }
+}
+
+class DeleteMemoWidget extends StatelessWidget {
+  final Memo memo;
+  const DeleteMemoWidget({super.key,required this.memo});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () async{
+        final confirm = await showDialog<bool>(
+          // 删除
+          context:context,
+          builder: (context) => AlertDialog(
+            title: Text('确认删除',style: MemoStyle.titleTextStyle,),
+            content: Text('确定要永久删除此memo吗？',style: MemoStyle.bodyTextStyle,),
+            actions:[
+              TextButton(
+                onPressed: ()=> Navigator.pop(context, false),
+                child:  Text('取消',style: MemoStyle.dialogButtonTextStyle,),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context,true),
+                child: Text('删除',style: MemoStyle.dialogButtonTextStyle,),
+              )
+            ],
+          ),
+        );
+        if(confirm == true) {
+          await deleteMemo(memo, () {
+            print("删除成功");
+            Navigator.pop(context);
+          });
+        }
+      },
+      icon: const Icon(Icons.delete_outline),
+    );
   }
 }
 
@@ -134,14 +261,14 @@ final Map<DateTime, int> heatmapData = {
 };
 
 class MyHeatMap extends StatelessWidget {
+  // TODO: 热力图
   const MyHeatMap();
-
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 392,
       height: 130,
-      margin: const EdgeInsets.only(bottom: 16), //安卓和windows有差异
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -149,16 +276,13 @@ class MyHeatMap extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
-          // TODO: 热力图
           children: [
             GitHubHeatmap(
-              startDate: DateTime.now().subtract(const Duration(days: 20 * 7)),
+              startDate: DateTime.now().subtract(const Duration(days: 29 * 7)),
               totalWeeks: 30,
-              // 显示列
               data: heatmapData,
               cellSize: 9,
-              // 单元格size
-              spacing: 1, // 间隔
+              spacing: 1,
             ),
           ],
         ),
@@ -166,6 +290,7 @@ class MyHeatMap extends StatelessWidget {
     );
   }
 }
+
 class MemoBackButton extends StatelessWidget {
   const MemoBackButton({super.key});
 
@@ -189,4 +314,3 @@ class MemoBackButton extends StatelessWidget {
     );
   }
 }
-

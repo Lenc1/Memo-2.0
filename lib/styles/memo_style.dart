@@ -29,6 +29,13 @@ class MemoStyle{
     fontWeight: FontWeight.w500,
     color: Color.fromRGBO(130, 130, 130, 1),
   );
+  // 弹窗按钮文字
+  static TextStyle get dialogButtonTextStyle => const TextStyle(
+    fontFamily: 'SourceHanSans',
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    color: Colors.blue,
+  );
   // 卡片阴影
   static BoxShadow get cardShadow => const BoxShadow(
     color: Color.fromRGBO(0, 0, 0, 0.25),

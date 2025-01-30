@@ -42,15 +42,26 @@ class GitHubHeatmap extends StatelessWidget {
   List<List<DateTime?>> _generateWeekColumns() {
     final weeks = <List<DateTime?>>[];
     DateTime currentMonday = _getPreviousMonday(startDate);
+    final DateTime today = DateTime.now();
 
     for (int week = 0; week < totalWeeks; week++) {
       final weekDays = <DateTime?>[];
       for (int day = 0; day < 7; day++) {
         final date = currentMonday.add(Duration(days: day));
-        weekDays.add(date);
+        // 如果日期超过今天，则不渲染
+        if (date.isAfter(today)) {
+          weekDays.add(null); // 使用 null 表示未来的日期
+        } else {
+          weekDays.add(date);
+        }
       }
       weeks.add(weekDays);
       currentMonday = currentMonday.add(const Duration(days: 7));
+
+      // 如果当前周的日期已经超过今天，则停止生成
+      if (currentMonday.isAfter(today)) {
+        break;
+      }
     }
     return weeks;
   }
