@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:memo_program/styles/memo_style.dart';
 import 'package:memo_program/widgets/user_widget.dart';
 import 'package:path_provider/path_provider.dart';
@@ -16,6 +17,9 @@ import 'pages/check_memo.dart';
 import 'pages/profile.dart';
 
 void main() async {
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+  ));
   WidgetsFlutterBinding.ensureInitialized();
   // await windowManager.ensureInitialized();
   //
@@ -140,6 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset : false,//关键一行，优化溢出
       backgroundColor: const Color.fromRGBO(240, 251, 255, 1),
       body: Column(
         children: [

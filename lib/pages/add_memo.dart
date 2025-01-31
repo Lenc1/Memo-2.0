@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 
 import '../models/memo.dart';
+import '../widgets/image_view.dart';
 
 class NewDiaryPage extends StatefulWidget {
   final Memo? memo;
@@ -23,7 +24,8 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
   final TextEditingController _titleController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   List<File> _images = [];
-
+  bool _isCheck = false;
+  String viewPic = '';
   @override
   void initState(){
     super.initState();
@@ -33,7 +35,17 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       _images = widget.memo!.images.map((path) => File(path)).toList();
     }
   }
-
+  void _viewImage(String path) {
+    setState(() {
+      _isCheck = true;
+      viewPic = path;
+    });
+  }
+  void _closeImageViewer() {
+    setState(() {
+      _isCheck = false;
+    });
+  }
   Future<void> _pickImages() async {
     final pickedFiles = await _picker.pickMultiImage();
     if (pickedFiles != null && pickedFiles.length <= 3) {
@@ -90,7 +102,8 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       backgroundColor: MemoStyle.memoBackGroundColor,
       body: Align(
         alignment: Alignment.topCenter,
-        child: Stack(children:[Container(
+        child: Stack(children:[
+          Container(
           margin: const EdgeInsets.only(top: 50),
           decoration: MemoStyle.cardDecoration,
           child: Column(
@@ -219,21 +232,24 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                             scrollDirection: Axis.horizontal,
                             itemCount: _images.length,
                             itemBuilder: (context, index) {
-                              return Container(
-                                width: 95,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 5),
-                                decoration: BoxDecoration(
+                              return InkWell(
+                                onTap: ()=> _viewImage(_images[index].path),
+                                child: Container(
+                                  width: 95,
+                                  margin:
+                                  const EdgeInsets.symmetric(horizontal: 5),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [MemoStyle.cardShadow]),
+                                  child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [MemoStyle.cardShadow]),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.file(
-                                    _images[index],
-                                    fit: BoxFit.cover,
+                                    child: Image.file(
+                                      _images[index],
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
-                              );
+                              ) ;
                             },
                           ),
                         ),
@@ -303,8 +319,16 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
               ),
             ),
           ),
+          if(_isCheck)
+            InkWell(
+                onTap: _closeImageViewer,
+                child: ImageViewerBuilder(
+                  path: viewPic,
+                )
+            )
     ]
-    ),)
+    ),
+      )
     );
   }
 }

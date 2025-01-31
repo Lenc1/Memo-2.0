@@ -149,13 +149,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  heatmap_calendar:
-    dependency: "direct main"
-    description:
-      name: heatmap_calendar
-      url: "https://mirrors.tuna.tsinghua.edu.cn/dart-pub/"
-    source: hosted
-    version: "1.2.8"
   http:
     dependency: transitive
     description:
