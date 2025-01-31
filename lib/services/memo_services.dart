@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import '../models/memo.dart';
 
@@ -20,4 +21,18 @@ Future<void> deleteMemo(Memo memo, VoidCallback onDeleteSuccess) async {
     debugPrint('删除失败: $e');
     rethrow;
   }
+}
+
+Future<String?> pickPath() async{
+  String? directoryPath = await FilePicker.platform.getDirectoryPath();
+    if (directoryPath != null) {
+      // 获取选择的文件夹路径
+      print("选择的文件夹路径: $directoryPath");
+    } else {
+      print("没有选择文件夹");
+    }
+}
+
+Future<void> openFloderPath() async{
+
 }

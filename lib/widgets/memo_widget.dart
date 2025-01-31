@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import '../config/memo_config.dart';
 import '../models/heat_map.dart';
 import '../models/memo.dart';
 import '../services/memo_services.dart';
@@ -79,11 +81,11 @@ class NewMemoWidget extends StatelessWidget {
                     ),
                   ]),
               child: Container(
-                margin: const EdgeInsets.only(top: 16, left: 22, bottom: 68),
+                margin: const EdgeInsets.only(top: 24, left: 22, bottom: 68),
                 child: Text(
                   _getCurrentDate(),
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -103,7 +105,7 @@ class NewMemoWidget extends StatelessWidget {
             Container(
               width: 35,
               height: 35,
-              margin: const EdgeInsets.only(top: 5, left: 306),
+              margin: const EdgeInsets.only(top: 5, left: 290),
               decoration: const BoxDecoration(
                   image:
                       DecorationImage(image: AssetImage('lib/assets/tag.png'))),
@@ -111,7 +113,7 @@ class NewMemoWidget extends StatelessWidget {
             Container(
               width: 60,
               height: 70,
-              margin: const EdgeInsets.only(top: 73, left: 281),
+              margin: const EdgeInsets.only(top: 73, left: 261),
               decoration: const BoxDecoration(
                   image:
                       DecorationImage(image: AssetImage('lib/assets/pen.png'))),
@@ -126,6 +128,7 @@ class NewMemoWidget extends StatelessWidget {
 class MemoListViewBuilder extends StatelessWidget {
   final List<Memo> memos;
   final void Function(Memo) onPressed;
+
   const MemoListViewBuilder({super.key,required this.memos, required this.onPressed});
 
   @override
@@ -134,102 +137,142 @@ class MemoListViewBuilder extends StatelessWidget {
       itemCount: memos.length,
       itemBuilder: (context, index) {
         final memo = memos[memos.length - index - 1];
-        return Align(
-          alignment: Alignment.topCenter,
-          child: Container(
-            width: 392,
-            height: 156,
-            margin: const EdgeInsets.only(bottom: 16,),
-            decoration: MemoStyle.cardDecoration,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: () {
-                  onPressed(memo);
-                },
-                child: Stack(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 29, left: 30),
-                      child: Text(
-                        memo.title.length > 10
-                            ? '${memo.title.substring(0, 10)}...'
-                            : memo.title,
-                        overflow: TextOverflow.ellipsis,
-                        style: MemoStyle.titleTextStyle.copyWith(
-                          fontSize: 18,
+        return Container(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Slidable(
+            endActionPane: ActionPane(
+              motion: const DrawerMotion(),
+              extentRatio: 0.25,
+              children: [
+                SlidableAction(
+                  onPressed: (context) {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text("确认删除", style: MemoStyle.titleTextStyle),
+                        content: Text("确定要删除这条memo吗？", style: MemoStyle.bodyTextStyle),
+                        actions: [
+                          TextButton(
+                            child: Text("取消", style: MemoStyle.dialogButtonTextStyle),
+                            onPressed: () => Navigator.pop(ctx),
+                          ),
+                          TextButton(
+                            child: Text("删除", style: MemoStyle.dialogButtonTextStyle.copyWith(color: Colors.red)),
+                            onPressed: () async{
+                              await deleteMemo(memo, () {
+                                print("删除成功");
+                                Navigator.pop(ctx);
+                                MemoConfig.toggleRefresh();
+                              });
+                            },
+                          ),
+                        ],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        backgroundColor: Colors.white,
+                      ),
+                    );
+                  },
+                  backgroundColor: const Color.fromRGBO(255, 73, 73, 1),
+                  foregroundColor: Colors.white,
+                  icon: Icons.delete,
+                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+                ),
+              ],
+            ),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                width: 392,
+                height: 156,
+                decoration: MemoStyle.cardDecoration,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () => onPressed(memo),
+                  child: Stack(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 29, left: 30),
+                        child: Text(
+                          memo.title.length > 10
+                              ? '${memo.title.substring(0, 10)}...'
+                              : memo.title,
+                          overflow: TextOverflow.ellipsis,
+                          style: MemoStyle.titleTextStyle.copyWith(
+                            fontSize: 18,
+                          ),
                         ),
                       ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(
-                          top: 58, left: 30, right: 144),
-                      child: const Divider(
-                        height: 1,
-                        color: Colors.grey,
-                        thickness: 1,
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(left: 31, top: 63),
-                      child: Text(
-                        memo.content.length > 10
-                            ? '${memo.content.substring(0, 10)}...'
-                            : memo.content,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: MemoStyle.bodyTextStyle.copyWith(
-                          fontSize: 14,
+                      Container(
+                        margin: const EdgeInsets.only(
+                            top: 58, left: 30, right: 154),
+                        child: const Divider(
+                          height: 1,
+                          color: Colors.grey,
+                          thickness: 1,
                         ),
                       ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 105, left: 31),
-                      child: Text(
-                        memo.created_at.substring(0, 10),
-                        style: MemoStyle.bodyHintTextStyle.copyWith(
-                          fontSize: 13,
+                      Container(
+                        margin: const EdgeInsets.only(left: 31, top: 63),
+                        child: Text(
+                          memo.content.length > 10
+                              ? '${memo.content.substring(0, 10)}...'
+                              : memo.content,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: MemoStyle.bodyTextStyle.copyWith(
+                            fontSize: 14,
+                          ),
                         ),
                       ),
-                    ),
-                    Container(
-                      width: 115,
-                      height: 115,
-                      margin: const EdgeInsets.only(top: 16, left: 250),
-                      decoration: BoxDecoration(
+                      Container(
+                        margin: const EdgeInsets.only(top: 105, left: 31),
+                        child: Text(
+                          memo.created_at.substring(0, 10),
+                          style: MemoStyle.bodyHintTextStyle.copyWith(
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 115,
+                        height: 115,
+                        margin: const EdgeInsets.only(top: 16, left: 250),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [MemoStyle.cardShadow,]),
+                        child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          boxShadow: [MemoStyle.cardShadow,]),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          File(memo.images[0]),
-                          fit: BoxFit.cover,
+                          child: Image.file(
+                            File(memo.images[0]),
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
+          ),
         );
       },
     );
   }
 }
-
 class DeleteMemoWidget extends StatelessWidget {
   final Memo memo;
   const DeleteMemoWidget({super.key,required this.memo});
-
   @override
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () async{
         final confirm = await showDialog<bool>(
-          // 删除
           context:context,
           builder: (context) => AlertDialog(
             title: Text('确认删除',style: MemoStyle.titleTextStyle,),
-            content: Text('确定要永久删除此memo吗？',style: MemoStyle.bodyTextStyle,),
+            content: Text('确定要删除这条memo吗？',style: MemoStyle.bodyTextStyle,),
             actions:[
               TextButton(
                 onPressed: ()=> Navigator.pop(context, false),
@@ -238,8 +281,12 @@ class DeleteMemoWidget extends StatelessWidget {
               TextButton(
                 onPressed: () => Navigator.pop(context,true),
                 child: Text('删除',style: MemoStyle.dialogButtonTextStyle,),
-              )
+              ),
             ],
+            shape:  RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+              backgroundColor: Colors.white,
           ),
         );
         if(confirm == true) {
@@ -311,6 +358,50 @@ class MemoBackButton extends StatelessWidget {
           Navigator.pop(context);
         },
       ),
+    );
+  }
+}
+
+class MemoReminderPop extends StatelessWidget {
+  final String title;
+  final String content;
+  final String action;
+  const MemoReminderPop({super.key,required this.title,required this.content,required this.action});
+
+  @override
+  Widget build(BuildContext context) {
+    return  AlertDialog(
+      title: Text(
+        title,
+        style: MemoStyle.titleTextStyle.copyWith(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      content: Text(
+        content,
+        style: MemoStyle.bodyTextStyle.copyWith(
+          fontSize: 16,
+          color: Colors.grey[700],
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Color.fromRGBO(64, 185, 222, 1),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+            ),
+          ),
+          child: Text(action,style: MemoStyle.dialogButtonTextStyle,),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      backgroundColor: Colors.white,
     );
   }
 }

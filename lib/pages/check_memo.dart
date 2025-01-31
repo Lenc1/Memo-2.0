@@ -4,7 +4,6 @@ import 'package:memo_program/pages/add_memo.dart';
 import 'package:memo_program/widgets/image_view.dart';
 import 'package:memo_program/widgets/memo_widget.dart';
 import 'package:memo_program/styles/memo_style.dart';
-import 'package:memo_program/services/memo_services.dart';
 import '../models/memo.dart';
 
 class MemoCheckPage extends StatefulWidget {
@@ -85,7 +84,15 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                       ),
                     ],
                   ),
-                  Positioned( //标题
+                  Positioned(
+                    top: 130,left:251,
+                      child: Text(
+                        memo.created_at.substring(0,10),
+                        style: MemoStyle.bodyHintTextStyle.copyWith(
+                          fontSize: 16,
+                    ),
+                  )),
+                  Positioned(
                     top: 90, left: 51, right: 51,
                     child: SizedBox(width: 250,
                       child: SingleChildScrollView(
@@ -95,7 +102,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                           style: MemoStyle.titleTextStyle,
                         ),
                       ),),),
-                  Container(//标题下面的线
+                  Container(
                     margin: const EdgeInsets.only(top: 128, left: 51, right: 51, bottom: 20,),
                     child: const Divider(
                       height: 1,

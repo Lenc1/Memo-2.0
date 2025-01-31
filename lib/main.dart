@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  void _reloadMemo() async {
+  void reloadMemo() async {
     _memo.clear();
     print("refreshing...");
     await _loadSavedMemos();
@@ -121,12 +121,16 @@ class _MyHomePageState extends State<MyHomePage> {
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => MemoCheckPage(memo: memo)),
-    ).then((_) => {_reloadMemo()});
+    ).then((_) => {reloadMemo()});
   }
+
   void _navigateToNewDiaryPage(BuildContext context) async {
     final newDiary = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const NewDiaryPage(memo: null,)),
+      MaterialPageRoute(
+          builder: (context) => const NewDiaryPage(
+                memo: null,
+              )),
     );
     if (newDiary != null) {
       setState(() {
@@ -134,6 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
+
   void _navigateToProfilePage(BuildContext context) async {
     await Navigator.push(
       context,
@@ -144,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset : false,//关键一行，优化溢出
+      resizeToAvoidBottomInset: false, //关键一行，优化溢出
       backgroundColor: const Color.fromRGBO(240, 251, 255, 1),
       body: Column(
         children: [
@@ -214,7 +219,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (context, showHeatMap, child) {
                       return IconButton(
                         onPressed: () {
-                          _reloadMemo();
+                          reloadMemo();
                           MemoConfig.toggleHeatMap();
                         },
                         icon: Icon(
@@ -247,14 +252,20 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           Expanded(
-              child: Align(
+            child: Align(
                 alignment: Alignment.topCenter,
-                child: MemoListViewBuilder(
-                  memos: _memo,
-                  onPressed: (memo) => _navigateToCheckMemoPage(context, memo),
-                ),
-              )
-              ),
+                child: ValueListenableBuilder(
+                    valueListenable: MemoConfig.refresh,
+                    builder: (context, refresh, child) {
+                      if (refresh == false) {reloadMemo();
+                      MemoConfig.toggleRefresh();}
+                      return MemoListViewBuilder(
+                        memos: _memo,
+                        onPressed: (memo) =>
+                            _navigateToCheckMemoPage(context, memo),
+                      );
+                    })),
+          ),
         ],
       ),
     );

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:memo_program/models/config_list.dart';
+import 'package:memo_program/services/memo_services.dart';
+import 'package:memo_program/styles/memo_style.dart';
 import 'package:memo_program/widgets/user_widget.dart';
 
 import '../widgets/memo_widget.dart';
@@ -65,15 +68,58 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
             ),
-            Container(
-              width: 392,
-              height: 300,
-              margin: EdgeInsets.only(top: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+            Expanded(
+              child: Container(
+                width: 392,
+                margin: const EdgeInsets.only(top: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ListView.builder(
+                  itemCount: ConfigList.configList.length,
+                  itemBuilder: (context, index) {
+                    final config = ConfigList.configList[index];
+                    return Container(
+                      padding: const EdgeInsets.only(top: 18, bottom: 16),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: SizedBox(
+                            height: 30,
+                            child: InkWell(
+                              onTap: () {
+                                pickPath();
+                                //跳转逻辑
+                              },
+                              child: Row(
+                                children: [
+                                  const SizedBox(width: 29),
+                                  Container(
+                                    width: 28,
+                                    height: 28,
+                                    decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                      image: AssetImage(config.configIcon),
+                                      fit: BoxFit.cover,
+                                    )),
+                                  ),
+                                  const SizedBox(width: 17),
+                                  Text(
+                                    config.configName,
+                                    style: MemoStyle.bodyTextStyle.copyWith(
+                                      color:
+                                          const Color.fromRGBO(51, 51, 51, 1),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
+            )
           ],
         ),
       ),
