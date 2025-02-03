@@ -86,7 +86,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                   ),
                   Positioned(
                     top: 130,left:251,
-                      child: Text(
+                      child: SelectableText(
                         memo.created_at.substring(0,10),
                         style: MemoStyle.bodyHintTextStyle.copyWith(
                           fontSize: 16,
@@ -97,7 +97,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                     child: SizedBox(width: 250,
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
-                        child:Text(
+                        child:SelectableText(
                           memo.title,
                           style: MemoStyle.titleTextStyle,
                         ),
@@ -120,7 +120,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                     child: SizedBox(
                       height: 360, // 限制滚动区域
                       child: SingleChildScrollView(
-                        child: Text(
+                        child: SelectableText(
                           memo.content,
                           style: MemoStyle.bodyTextStyle,
                         ),
