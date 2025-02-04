@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/widgets/memo_widget.dart';
 import 'dart:io';
 import 'package:memo_program/styles/memo_style.dart';
@@ -84,8 +85,8 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
             now.millisecondsSinceEpoch.toString(), // 如果是编辑模式，保留原时间戳
       );
 
-      final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/memo_${newMemo.milliseconds}.json');
+      final directory = await PathManager.getSavePath();
+      final file = File('$directory/memo_${newMemo.milliseconds}.json');
       final memoJson = jsonEncode(newMemo.toJson());
       await file.writeAsString(memoJson);
 
