@@ -222,7 +222,16 @@ class MemoListViewBuilder extends StatelessWidget {
                             boxShadow: [MemoStyle.cardShadow,]),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
+                          child: memo.images.isEmpty
+                          ?  Container(
+                            decoration: const BoxDecoration(
+                                image: DecorationImage(
+                                    image: AssetImage('lib/assets/memo_placeholder.png'),
+                                  fit: BoxFit.cover,
+                                )
+                            ),
+                          )
+                          : Image.file(
                             File(memo.images[0]),
                             fit: BoxFit.cover,
                           ),
@@ -254,6 +263,7 @@ class DeleteMemoWidget extends StatelessWidget {
     );
   }
 }
+
 Future<bool?> showDeleteDialog(BuildContext context) async {
   return showDialog<bool>(
     context: context,

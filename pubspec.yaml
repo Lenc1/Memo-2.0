@@ -46,6 +46,7 @@ flutter:
     - lib/assets/file_download_icon.png
     - lib/assets/file_upload_icon.png
     - lib/assets/floder_icon.png
+    - lib/assets/memo_placeholder.png
   fonts:
     - family: SourceHanSans
       fonts:

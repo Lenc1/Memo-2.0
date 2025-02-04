@@ -48,7 +48,6 @@ class PathManager {
   static Future<String?> pickPath() async {
     String? directoryPath = await FilePicker.platform.getDirectoryPath();
     if (directoryPath != null) {
-      // 在更新路径前获取旧的保存路径
       final oldSavePath = await getSavePath();
       await moveFile(oldSavePath, directoryPath);
       customPath = directoryPath;
