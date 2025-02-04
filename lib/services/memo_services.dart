@@ -2,25 +2,43 @@ import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
-import 'package:path/path.dart' as path;  // 使用 path 包来处理路径
+import 'package:path/path.dart' as path;
 
 import '../models/memo.dart';
+import '../widgets/memo_widget.dart';
 
-Future<void> deleteMemo(Memo memo, VoidCallback onDeleteSuccess) async {
+Future<void> deleteMemo(Memo memo) async {
+  final directory = await PathManager.getSavePath();
+  final file = File(path.join(directory, 'memo_${memo.milliseconds}.json'));  // 使用 path.join 来拼接路径
+
   try {
-    final directory = await PathManager.getSavePath();
-    final file = File(path.join(directory, 'memo_${memo.milliseconds}.json'));  // 使用 path.join 来拼接路径
-
     if (await file.exists()) {
       await file.delete();
       debugPrint('文件删除成功: ${file.path}');
-      onDeleteSuccess();
     } else {
       debugPrint('文件不存在: ${file.path}');
     }
   } catch (e) {
     debugPrint('删除失败: $e');
     rethrow;
+  }
+}
+
+Future<void> handleDeleteMemo({
+  required BuildContext context,
+  required Memo memo,
+  required VoidCallback onSuccess,
+}) async {
+  final confirm = await showDeleteDialog(context);
+  if (confirm ?? false) {
+    try {
+      await deleteMemo(memo);
+      onSuccess();
+      debugPrint("删除成功");
+    } catch (e) {
+      debugPrint('删除操作遇到错误: $e');
+      // 可以在此显示错误信息提示给用户
+    }
   }
 }
 

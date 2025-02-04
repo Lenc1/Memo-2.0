@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/styles/memo_style.dart';
 import 'package:memo_program/widgets/user_widget.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart'; //管理窗口，windows构造时启用
 import 'config/memo_config.dart';
 import 'models/memo.dart';
@@ -256,8 +255,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: ValueListenableBuilder(
                     valueListenable: MemoConfig.refresh,
                     builder: (context, refresh, child) {
-                      if (refresh == false) {reloadMemo();
-                      MemoConfig.toggleRefresh();}
+                      if (refresh == false) {
+                        reloadMemo();
+                        MemoConfig.toggleRefresh();}
                       return MemoListViewBuilder(
                         memos: _memo,
                         onPressed: (memo) =>

@@ -145,33 +145,11 @@ class MemoListViewBuilder extends StatelessWidget {
               extentRatio: 0.25,
               children: [
                 SlidableAction(
-                  onPressed: (context) {
-                    showDialog(
+                  onPressed: (context) async{
+                    await handleDeleteMemo(
                       context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: Text("确认删除", style: MemoStyle.titleTextStyle),
-                        content: Text("确定要删除这条memo吗？", style: MemoStyle.bodyTextStyle),
-                        actions: [
-                          TextButton(
-                            child: Text("取消", style: MemoStyle.dialogButtonTextStyle),
-                            onPressed: () => Navigator.pop(ctx),
-                          ),
-                          TextButton(
-                            child: Text("删除", style: MemoStyle.dialogButtonTextStyle.copyWith(color: Colors.red)),
-                            onPressed: () async{
-                              await deleteMemo(memo, () {
-                                print("删除成功");
-                                Navigator.pop(ctx);
-                                MemoConfig.toggleRefresh();
-                              });
-                            },
-                          ),
-                        ],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        backgroundColor: Colors.white,
-                      ),
+                      memo: memo,
+                      onSuccess:  MemoConfig.toggleRefresh,
                     );
                   },
                   backgroundColor: const Color.fromRGBO(255, 73, 73, 1),
@@ -268,39 +246,39 @@ class DeleteMemoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () async{
-        final confirm = await showDialog<bool>(
-          context:context,
-          builder: (context) => AlertDialog(
-            title: Text('确认删除',style: MemoStyle.titleTextStyle,),
-            content: Text('确定要删除这条memo吗？',style: MemoStyle.bodyTextStyle,),
-            actions:[
-              TextButton(
-                onPressed: ()=> Navigator.pop(context, false),
-                child:  Text('取消',style: MemoStyle.dialogButtonTextStyle,),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context,true),
-                child: Text('删除',style: MemoStyle.dialogButtonTextStyle,),
-              ),
-            ],
-            shape:  RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-              backgroundColor: Colors.white,
-          ),
-        );
-        if(confirm == true) {
-          await deleteMemo(memo, () {
-            print("删除成功");
-            Navigator.pop(context);
-          });
-        }
+        await handleDeleteMemo(context: context, memo: memo, onSuccess: (){
+          Navigator.pop(context);
+        });
       },
       icon: const Icon(Icons.delete_outline),
     );
   }
 }
-
+Future<bool?> showDeleteDialog(BuildContext context) async {
+  return showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text("确认删除", style: MemoStyle.titleTextStyle),
+      content: Text("确定要删除这条memo吗？", style: MemoStyle.bodyTextStyle),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text("取消", style: MemoStyle.dialogButtonTextStyle),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: Text("删除",
+              style: MemoStyle.dialogButtonTextStyle.copyWith(color: Colors.red)
+          ),
+        ),
+      ],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      backgroundColor: Colors.white,
+    ),
+  );
+}
 final Map<DateTime, int> heatmapData = {
   DateTime.now().subtract(Duration(days: 5)): 2,
   DateTime.now().subtract(Duration(days: 8)): 4,
