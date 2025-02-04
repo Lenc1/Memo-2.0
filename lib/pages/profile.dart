@@ -14,8 +14,10 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+
   @override
   Widget build(BuildContext context) {
+    String directoryPath;
     return Scaffold(
       backgroundColor: const Color.fromRGBO(240, 251, 255, 1),
       body: Align(
@@ -85,35 +87,40 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: SizedBox(
-                            height: 30,
-                            child: InkWell(
-                              onTap: () {
-                                pickPath();
-                                //跳转逻辑
-                              },
-                              child: Row(
-                                children: [
-                                  const SizedBox(width: 29),
-                                  Container(
-                                    width: 28,
-                                    height: 28,
-                                    decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                      image: AssetImage(config.configIcon),
-                                      fit: BoxFit.cover,
-                                    )),
+                          height: 30,
+                          child: InkWell(
+                            onTap: () async{
+                              String? path = await PathManager.pickPath();
+                              if (path != null) {
+                                print("选择的路径是：$path");
+                              } else {
+                                print("没有选择文件夹");
+                              }
+                              //跳转逻辑
+                            },
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 29),
+                                Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                    image: AssetImage(config.configIcon),
+                                    fit: BoxFit.cover,
+                                  )),
+                                ),
+                                const SizedBox(width: 17),
+                                Text(
+                                  config.configName,
+                                  style: MemoStyle.bodyTextStyle.copyWith(
+                                    color: const Color.fromRGBO(51, 51, 51, 1),
                                   ),
-                                  const SizedBox(width: 17),
-                                  Text(
-                                    config.configName,
-                                    style: MemoStyle.bodyTextStyle.copyWith(
-                                      color:
-                                          const Color.fromRGBO(51, 51, 51, 1),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            )),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     );
                   },

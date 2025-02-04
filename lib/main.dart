@@ -4,6 +4,7 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/styles/memo_style.dart';
 import 'package:memo_program/widgets/user_widget.dart';
 import 'package:path_provider/path_provider.dart';
@@ -86,8 +87,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _loadSavedMemos() async {
     print("loading...");
-    final directory = await getApplicationDocumentsDirectory();
-    final dir = Directory(directory.path);
+    final directory = await PathManager.getSavePath();
+    final dir = Directory(directory);
     final files = await dir
         .list()
         .where((file) =>
@@ -128,9 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final newDiary = await Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => const NewDiaryPage(
-                memo: null,
-              )),
+          builder: (context) => const NewDiaryPage(memo: null,)),
     );
     if (newDiary != null) {
       setState(() {
@@ -142,8 +141,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void _navigateToProfilePage(BuildContext context) async {
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const ProfilePage()),
-    );
+      MaterialPageRoute(builder: (context) => const ProfilePage())
+      ).then((_)=>{reloadMemo()});
   }
 
   @override
