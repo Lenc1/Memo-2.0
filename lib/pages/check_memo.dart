@@ -8,7 +8,7 @@ import '../models/memo.dart';
 
 class MemoCheckPage extends StatefulWidget {
   final Memo memo;
-  MemoCheckPage({super.key, required this.memo});
+  const MemoCheckPage({super.key, required this.memo});
 
   @override
   _MemoCheckPageState createState() => _MemoCheckPageState();

@@ -41,8 +41,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _loadSavedMemos() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final dir = Directory(directory.path);
+    final directory = await PathManager.getSavePath();
+    final dir = Directory(directory);
     final files = await dir
         .list()
         .where((file) => file.path.endsWith('.json') && file.path.contains('memo_'))
