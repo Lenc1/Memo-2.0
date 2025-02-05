@@ -12,3 +12,11 @@ A note-taking app developed based on Flutter, which supports storing 1 to 3 pict
 [UI design link](https://js.design/f/8LEH9N?p=_rjXbN9oGB&linkelement=x95BzVvwrpfqJ6aqpleG3)
 
 ![image-20250204195843221](.image/image-20250204195843221.png)
+
+## License
+
+> Copyright (c) 2025 Lenci
+>
+> Licensed under the [MIT](https://opensource.org/license/mit) license.
+>
+> See the [LICENSE](https://github.com/Lenc1/Memo-2.0/blob/main/LICENSE) file for the whole license text.
