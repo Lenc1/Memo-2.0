@@ -19,7 +19,7 @@ class Memo {
     return {
       'title': title,
       'content': content,
-      'images': images,  // 存储路径
+      'images': images,
       'created_at': created_at,
       'milliseconds': milliseconds,
     };
@@ -29,7 +29,7 @@ class Memo {
     return Memo(
       title: json['title'],
       content: json['content'],
-      images: List<String>.from(json['images']),  // 从路径列表恢复
+      images: List<String>.from(json['images']),
       created_at: json['created_at'],
       milliseconds: json['milliseconds'],
     );
