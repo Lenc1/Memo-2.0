@@ -10,6 +10,25 @@ import '../models/memo.dart';
 import '../widgets/memo_widget.dart';
 
 class CURDManager{
+  static Future<void> savePicture(
+      String originPath,
+      )async {
+    final targetPath = await FilePicker.platform.getDirectoryPath();
+    final now = DateTime.now();
+    //final picFile = File(path);
+    if(targetPath != null) {
+      String optPath = path.join(targetPath,'memoPic_${now.millisecondsSinceEpoch.toString()}.${originPath.split('.').last}');
+      try {
+        print(originPath);
+        print(targetPath);
+        print(optPath);
+        await File(originPath).copy(optPath);
+        print("保存成功");
+      } catch(e){
+        print("图片复制失败：$e");
+      }
+    }
+  }
   static Future<void> saveMemo(
       BuildContext context,
       TextEditingController controller,
@@ -45,40 +64,41 @@ class CURDManager{
       );
     }
   }
-}
-Future<void> deleteMemo(Memo memo) async {
-  final directory = await PathManager.getSavePath();
-  final file = File(path.join(directory, 'memo_${memo.milliseconds}.json'));  // 使用 path.join 来拼接路径
+  static Future<void> deleteMemo(Memo memo) async {
+    final directory = await PathManager.getSavePath();
+    final file = File(path.join(directory, 'memo_${memo.milliseconds}.json'));  // 使用 path.join 来拼接路径
 
-  try {
-    if (await file.exists()) {
-      await file.delete();
-      debugPrint('文件删除成功: ${file.path}');
-    } else {
-      debugPrint('文件不存在: ${file.path}');
-    }
-  } catch (e) {
-    debugPrint('删除失败: $e');
-    rethrow;
-  }
-}
-
-Future<void> handleDeleteMemo({
-  required BuildContext context,
-  required Memo memo,
-  required VoidCallback onSuccess,
-}) async {
-  final confirm = await showDeleteDialog(context);
-  if (confirm ?? false) {
     try {
-      await deleteMemo(memo);
-      onSuccess();
-      debugPrint("删除成功");
+      if (await file.exists()) {
+        await file.delete();
+        debugPrint('文件删除成功: ${file.path}');
+      } else {
+        debugPrint('文件不存在: ${file.path}');
+      }
     } catch (e) {
-      debugPrint('删除操作遇到错误: $e');
+      debugPrint('删除失败: $e');
+      rethrow;
+    }
+  }
+
+  static Future<void> handleDeleteMemo({
+    required BuildContext context,
+    required Memo memo,
+    required VoidCallback onSuccess,
+  }) async {
+    final confirm = await showDeleteDialog(context);
+    if (confirm ?? false) {
+      try {
+        await deleteMemo(memo);
+        onSuccess();
+        debugPrint("删除成功");
+      } catch (e) {
+        debugPrint('删除操作遇到错误: $e');
+      }
     }
   }
 }
+
 
 class PathManager {
   static String? customPath;

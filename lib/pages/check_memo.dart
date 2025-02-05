@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:memo_program/pages/add_memo.dart';
+import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/widgets/image_view.dart';
 import 'package:memo_program/widgets/memo_widget.dart';
 import 'package:memo_program/styles/memo_style.dart';
@@ -21,7 +22,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
   @override
   void initState() {
     super.initState();
-    memo = widget.memo; // 获取传递的 memo 数据
+    memo = widget.memo;
     viewPic = widget.memo.images.isNotEmpty ? widget.memo.images[0] : '';
   }
   void _viewImage(String path) {
@@ -172,6 +173,18 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
             ),
             if(_isCheck)
               InkWell(
+                onLongPress: () async{
+                  final confirm = await showSavePicDialog(context);
+                  if(confirm ?? false) {
+                    try {
+                      await CURDManager.savePicture(viewPic);
+
+                    } catch(e) {
+                      debugPrint('保存图片遇到错误: $e');
+                    }
+                  }
+
+                },
                 onTap: _closeImageViewer,
                 child: ImageViewerBuilder(
                   path: viewPic,
