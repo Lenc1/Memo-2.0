@@ -13,3 +13,11 @@ Memo1.0：[Lenc1/Memo](https://github.com/Lenc1/Memo)
 [Memo2即时设计链接](https://js.design/f/8LEH9N?p=_rjXbN9oGB&linkelement=x95BzVvwrpfqJ6aqpleG3) 
 
 ![image-20250204195843221](.image/image-20250204195843221.png)
+
+## 许可协议
+
+> 版权所有 (c) 2025 Lenci 
+>
+> 本项目根据 [MIT](https://opensource.org/license/mit) 协议授权
+>
+> 请参阅 [LICENSE](https://github.com/Lenc1/Memo-2.0/blob/main/LICENSE) 文件查看完整许可证内容
