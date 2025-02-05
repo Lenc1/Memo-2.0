@@ -24,6 +24,7 @@ dependencies:
   path_provider: ^2.0.11
   flutter_slidable: ^2.0.0
   photo_view: ^0.15.0
+  flutter_svg_provider: ^1.0.0
 
 
 dev_dependencies:
@@ -36,17 +37,18 @@ flutter:
   uses-material-design: true
   assets:
     - lib/assets/avator.jpg
-    - lib/assets/addition_fill.png
+    - lib/assets/addition_fill.svg
     - lib/assets/tag.png
     - lib/assets/pen.png
-    - lib/assets/back.png
-    - lib/assets/photos.png
+    - lib/assets/back.svg
+    - lib/assets/photos.svg
     - lib/assets/backfile.png
-    - lib/assets/equipment.png
-    - lib/assets/file_download_icon.png
-    - lib/assets/file_upload_icon.png
-    - lib/assets/floder_icon.png
+    - lib/assets/equipment.svg
+    - lib/assets/file_download_icon.svg
+    - lib/assets/file_upload_icon.svg
+    - lib/assets/floder_icon.svg
     - lib/assets/memo_placeholder.png
+    - lib/assets/camera.svg
   fonts:
     - family: SourceHanSans
       fonts:

@@ -1,6 +1,7 @@
 // add_memo.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/widgets/memo_widget.dart';
@@ -314,8 +315,8 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                                       height: 29,
                                       decoration: const BoxDecoration(
                                           image: DecorationImage(
-                                              image: AssetImage(
-                                                  'lib/assets/camera.png'))),
+                                              image: Svg(
+                                                  'lib/assets/camera.svg'))),
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
@@ -344,8 +345,8 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                                     height: 29,
                                     decoration: const BoxDecoration(
                                         image: DecorationImage(
-                                            image: AssetImage(
-                                                'lib/assets/photos.png'))),
+                                            image: Svg(
+                                                'lib/assets/photos.svg'))),
                                   ),
                                   const SizedBox(
                                     width: 8,

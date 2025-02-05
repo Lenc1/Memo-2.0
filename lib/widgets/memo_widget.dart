@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import '../config/memo_config.dart';
 import '../models/heat_map.dart';
 import '../models/memo.dart';
@@ -97,7 +98,7 @@ class NewMemoWidget extends StatelessWidget {
               margin: const EdgeInsets.only(top: 56, left: 32),
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('lib/assets/addition_fill.png'),
+                  image: Svg('lib/assets/addition_fill.svg'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -336,7 +337,7 @@ class MemoBackButton extends StatelessWidget {
       height: 20,
       decoration: const BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('lib/assets/back.png'),
+          image: Svg('lib/assets/back.svg'),
           fit: BoxFit.cover,
         ),
       ),

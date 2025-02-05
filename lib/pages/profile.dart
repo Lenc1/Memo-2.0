@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:memo_program/models/config_list.dart';
 import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/styles/memo_style.dart';
@@ -110,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   height: 28,
                                   decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: AssetImage(config.configIcon),
+                                        image: Svg(config.configIcon),
                                         fit: BoxFit.cover,
                                       )),
                                 ),
