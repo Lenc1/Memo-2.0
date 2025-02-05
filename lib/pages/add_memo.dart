@@ -6,8 +6,6 @@ import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/widgets/memo_widget.dart';
 import 'dart:io';
 import 'package:memo_program/styles/memo_style.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:convert';
 
 import '../models/memo.dart';
 import '../widgets/image_view.dart';
@@ -27,6 +25,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
   final ImagePicker _picker = ImagePicker();
   List<File> _images = [];
   bool _isCheck = false;
+  bool isWindows = Platform.isWindows;
   String viewPic = '';
 
   @override
@@ -36,6 +35,21 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       _titleController.text = widget.memo!.title;
       _controller.text = widget.memo!.content;
       _images = widget.memo!.images.map((path) => File(path)).toList();
+    }
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _images.removeAt(index);
+    });
+  }
+
+  Future<void> _takePicture() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    if (image != null) {
+      setState(() {
+        _images.add(File(image.path)); // 新图片添加到现有图片列表中
+      });
     }
   }
 
@@ -54,11 +68,9 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
 
   Future<void> _pickImages() async {
     final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles != null && pickedFiles.length <= 3) {
+    if (pickedFiles != null && pickedFiles.length+_images.length <= 3) {
       setState(() {
-        _images = pickedFiles.map((e) {
-          return File(e.path);
-        }).toList();
+        _images.addAll(pickedFiles.map((e)=>File(e.path)));
       });
     } else {
       showDialog(
@@ -66,37 +78,6 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
         builder: (BuildContext context) {
           return const MemoReminderPop(
               title: '提示', content: '最多只能选择3张图片', action: '确定');
-        },
-      );
-    }
-  }
-
-  void _saveMemo() async {
-    if (_controller.text.isNotEmpty) {
-      final now = DateTime.now();
-      final newMemo = Memo(
-        title: _titleController.text,
-        content: _controller.text,
-        images: _images.map((file) => file.path).toList(),
-        // 保存图片路径
-        created_at: widget.memo?.created_at ?? now.toIso8601String(),
-        // 如果是编辑模式，保留原创建时间
-        milliseconds: widget.memo?.milliseconds ??
-            now.millisecondsSinceEpoch.toString(), // 如果是编辑模式，保留原时间戳
-      );
-
-      final directory = await PathManager.getSavePath();
-      final file = File('$directory/memo_${newMemo.milliseconds}.json');
-      final memoJson = jsonEncode(newMemo.toJson());
-      await file.writeAsString(memoJson);
-
-      Navigator.pop(context, newMemo);
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const MemoReminderPop(
-              title: '提示', content: '请填写内容并选择至少1张图片', action: '确定');
         },
       );
     }
@@ -147,7 +128,15 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                           Container(
                             margin: const EdgeInsets.only(left: 20, top: 36),
                             child: ElevatedButton(
-                              onPressed: _saveMemo,
+                              onPressed: () {
+                                CURDManager.saveMemo(
+                                  context,
+                                  _controller,
+                                  _titleController,
+                                  _images,
+                                  widget.memo,
+                                );
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
                                     const Color.fromRGBO(64, 185, 222, 1),
@@ -179,7 +168,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                           controller: _titleController,
                           onChanged: (text) {
                             setState(() {
-                              print('ovo');
+                              print('input...');
                             });
                           },
                           decoration: const InputDecoration(
@@ -238,43 +227,68 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                         ),
                       ),
                       const SizedBox(height: 50),
-                      Stack(
-                        children: [
-                          //ClipRRect(child: const SizedBox(height: 150),),
-                          if (_images.isNotEmpty) ...[
-                            Container(
+                      Stack(children: [
+                        //ClipRRect(child: const SizedBox(height: 150),),
+                        if (_images.isNotEmpty) ...[
+                          Container(
                               height: 95,
                               margin: const EdgeInsets.only(left: 31),
                               child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
+                                scrollDirection: Axis.horizontal, // 横向滚动
                                 itemCount: _images.length,
                                 itemBuilder: (context, index) {
-                                  return InkWell(
-                                    onTap: () =>
-                                        _viewImage(_images[index].path),
-                                    child: Container(
-                                      width: 95,
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 5),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                          boxShadow: [MemoStyle.cardShadow]),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Image.file(
-                                          _images[index],
-                                          fit: BoxFit.cover,
-                                        ),
+                                  return Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 5), // 水平间距
+                                    child: AspectRatio(
+                                      aspectRatio: 1,
+                                      child: Stack(
+                                        alignment: Alignment.topRight,
+                                        children: [
+                                          Container(
+                                            height: 95,
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              child: Image.file(
+                                                _images[index],
+                                                fit: BoxFit.fill,
+                                              ),
+                                            ),
+                                          ),
+                                          InkWell(
+                                            onTap: () =>
+                                                _viewImage(_images[index].path),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                color: Colors.black
+                                                    .withOpacity(0.4), // 半透明黑色
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 20,
+                                            height: 20,
+                                            margin: const EdgeInsets.all(5),
+                                            child: InkWell(
+                                              onTap: () => _removeImage(index),
+                                              child: const Icon(
+                                                Icons.close,
+                                                size: 16,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   );
                                 },
-                              ),
-                            ),
-                          ],
+                              )),
                         ],
-                      ),
+                      ]),
                       const SizedBox(height: 10),
                       const Divider(
                         height: 1,
@@ -284,6 +298,35 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (!isWindows)
+                            InkWell(
+                              onTap: _takePicture,
+                              child: Container(
+                                alignment: Alignment.topLeft,
+                                width: 140,
+                                margin:
+                                    const EdgeInsets.only(top: 10, left: 51),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 29,
+                                      height: 29,
+                                      decoration: const BoxDecoration(
+                                          image: DecorationImage(
+                                              image: AssetImage(
+                                                  'lib/assets/camera.png'))),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '拍照上传',
+                                      style: MemoStyle.bodyHintTextStyle,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          if(_images.length<3)
                           InkWell(
                             onTap: () {
                               print("picking Image...");
@@ -308,7 +351,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                                     width: 8,
                                   ),
                                   Text(
-                                    _images.isEmpty ? '上传照片' : '重新选择',
+                                    _images.isEmpty ? '上传照片' : '继续上传',
                                     style: MemoStyle.bodyHintTextStyle,
                                   ),
                                 ],

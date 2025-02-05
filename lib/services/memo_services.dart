@@ -1,12 +1,51 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
-import 'dart:io';
 import 'package:path/path.dart' as path;
-
+import 'dart:io';
 import '../models/memo.dart';
 import '../widgets/memo_widget.dart';
 
+class CURDManager{
+  static Future<void> saveMemo(
+      BuildContext context,
+      TextEditingController controller,
+      TextEditingController titleController,
+      List<File> images,
+      Memo? memo, // 传递原始memo（如果是编辑模式）
+      ) async {
+    if (controller.text.isNotEmpty) {
+      final now = DateTime.now();
+      final newMemo = Memo(
+        title: titleController.text,
+        content: controller.text,
+        images: images.map((file) => file.path).toList(),
+        created_at: memo?.created_at ?? now.toIso8601String(),
+        milliseconds: memo?.milliseconds ?? now.millisecondsSinceEpoch.toString(),
+      );
+
+      // 获取保存路径
+      final directory = await PathManager.getSavePath();
+      final file = File('$directory/memo_${newMemo.milliseconds}.json');
+      final memoJson = jsonEncode(newMemo.toJson());
+      await file.writeAsString(memoJson);
+
+      // 返回新的memo
+      Navigator.pop(context, newMemo);
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return const MemoReminderPop(
+              title: '提示', content: '请填写内容并选择至少1张图片', action: '确定');
+        },
+      );
+    }
+  }
+}
 Future<void> deleteMemo(Memo memo) async {
   final directory = await PathManager.getSavePath();
   final file = File(path.join(directory, 'memo_${memo.milliseconds}.json'));  // 使用 path.join 来拼接路径
@@ -37,7 +76,6 @@ Future<void> handleDeleteMemo({
       debugPrint("删除成功");
     } catch (e) {
       debugPrint('删除操作遇到错误: $e');
-      // 可以在此显示错误信息提示给用户
     }
   }
 }
@@ -49,8 +87,13 @@ class PathManager {
     String? directoryPath = await FilePicker.platform.getDirectoryPath();
     if (directoryPath != null) {
       final oldSavePath = await getSavePath();
-      await moveFile(oldSavePath, directoryPath);
-      customPath = directoryPath;
+      final comPath = path.join(directoryPath, 'memos');
+      if (comPath != oldSavePath) {
+        await moveFile(oldSavePath, directoryPath);
+        customPath = directoryPath;
+      } else {
+        debugPrint('选择的路径与旧路径相同，无需移动文件');
+      }
       return directoryPath;
     }
     return null;
@@ -66,7 +109,7 @@ class PathManager {
     // 创建目录（如果不存在）
     final directory = Directory(fullPath);
     if (!await directory.exists()) {
-      await directory.create(recursive: true);  // recursive: true 确保创建所有必要父目录
+      await directory.create(recursive: true);
       debugPrint('Created directory: $fullPath');
     }
 
@@ -100,13 +143,11 @@ class PathManager {
           }
         }
       }
-
-      // 删除旧目录（可选）
-      try {
-        await oldDirectory.delete(recursive: false);
-      } catch (e) {
-        debugPrint('Could not delete old directory: $e');
-      }
+      // try {
+      //   await oldDirectory.delete(recursive: false);
+      // } catch (e) {
+      //   debugPrint('Could not delete old directory: $e');
+      // }
     }
   }
   static bool _isMemoFile(File file) {

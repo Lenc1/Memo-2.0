@@ -110,9 +110,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                   height: 28,
                                   decoration: BoxDecoration(
                                       image: DecorationImage(
-                                    image: AssetImage(config.configIcon),
-                                    fit: BoxFit.cover,
-                                  )),
+                                        image: AssetImage(config.configIcon),
+                                        fit: BoxFit.cover,
+                                      )),
                                 ),
                                 const SizedBox(width: 17),
                                 Text(

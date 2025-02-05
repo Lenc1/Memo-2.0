@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:memo_program/models/memo.dart';
 import 'package:memo_program/styles/memo_style.dart';
 import 'package:memo_program/widgets/user_widget.dart';
-import 'package:memo_program/services/memo_services.dart';  // 如果需要的服务也可以导入
+import 'package:memo_program/services/memo_services.dart';
 
-import 'package:path_provider/path_provider.dart';  // 用于文件路径管理
+import 'package:path_provider/path_provider.dart';
 import '../config/memo_config.dart';
 import '../widgets/memo_widget.dart';
 import 'check_memo.dart';
