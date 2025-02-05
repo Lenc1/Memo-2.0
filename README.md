@@ -1,5 +1,5 @@
 # Memo-2.0 电子日记
-<code>![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)
+<code>![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)</code>
 
 语言: [简体中文](https://github.com/Lenc1/Memo-2.0/blob/main/README.md) | [English](https://github.com/Lenc1/Memo-2.0/blob/main/README_EN.md)
 
