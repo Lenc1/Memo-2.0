@@ -14,7 +14,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-
   @override
   Widget build(BuildContext context) {
     String directoryPath;
@@ -89,14 +88,19 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: SizedBox(
                           height: 30,
                           child: InkWell(
-                            onTap: () async{
-                              String? path = await PathManager.pickPath();
-                              if (path != null) {
-                                print("选择的路径是：$path");
-                              } else {
-                                print("没有选择文件夹");
+                            onTap: () async {
+                              switch (config.configRoute) {
+                                case '1':
+                                  String? path = await PathManager.pickPath();
+                                  if (path != null) {
+                                    print("选择的路径是：$path");
+                                  } else {
+                                    print("没有选择文件夹");
+                                  }
+                                  break; // 加上 break 语句
+                                default:
+                                  print("无效的路径");
                               }
-                              //跳转逻辑
                             },
                             child: Row(
                               children: [

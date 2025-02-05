@@ -72,7 +72,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
   }
 
   void _saveMemo() async {
-    if (_controller.text.isNotEmpty && _images.isNotEmpty) {
+    if (_controller.text.isNotEmpty) {
       final now = DateTime.now();
       final newMemo = Memo(
         title: _titleController.text,
