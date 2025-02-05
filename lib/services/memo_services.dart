@@ -29,6 +29,31 @@ class CURDManager{
       }
     }
   }
+  static Future<String?> movePicture(String originPath) async {
+    final directory = await PathManager.getSavePath();
+    final optPath = Directory(path.join(directory,'pictures'));
+
+    // 如果文件夹不存在，则创建
+    if (!await optPath.exists()) {
+      await optPath.create(recursive: true);
+    }
+
+    // 获取新的图片文件名
+    final fileName = 'memoPic_${DateTime.now().millisecondsSinceEpoch}.${originPath.split('.').last}';
+    final newPath = path.join(optPath.path, fileName);
+
+    try {
+      print('原始路径: $originPath');
+      print('目标路径: $newPath');
+      await File(originPath).copy(newPath);
+      print("图片保存成功");
+
+      return newPath;
+    } catch (e) {
+      print("图片复制失败: $e");
+    }
+    return null;
+  }
   static Future<void> saveMemo(
       BuildContext context,
       TextEditingController controller,
@@ -38,10 +63,22 @@ class CURDManager{
       ) async {
     if (controller.text.isNotEmpty) {
       final now = DateTime.now();
+      List<String> imagePaths = [];
+      for(var image in images) {
+        if (image.path.contains('memoPic_'))
+        {
+          imagePaths.add(image.path);
+        } else {
+          final newImagePath = await movePicture(image.path);
+          if(newImagePath != null){
+            imagePaths.add(newImagePath);
+          }
+        }
+      }
       final newMemo = Memo(
         title: titleController.text,
         content: controller.text,
-        images: images.map((file) => file.path).toList(),
+        images: imagePaths,
         created_at: memo?.created_at ?? now.toIso8601String(),
         milliseconds: memo?.milliseconds ?? now.millisecondsSinceEpoch.toString(),
       );
