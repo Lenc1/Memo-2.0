@@ -147,7 +147,7 @@ class MemoListViewBuilder extends StatelessWidget {
               children: [
                 SlidableAction(
                   onPressed: (context) async{
-                    await handleDeleteMemo(
+                    await CURDManager.handleDeleteMemo(
                       context: context,
                       memo: memo,
                       onSuccess:  MemoConfig.toggleRefresh,
@@ -256,7 +256,7 @@ class DeleteMemoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () async{
-        await handleDeleteMemo(context: context, memo: memo, onSuccess: (){
+        await CURDManager.handleDeleteMemo(context: context, memo: memo, onSuccess: (){
           Navigator.pop(context);
         });
       },
@@ -264,7 +264,34 @@ class DeleteMemoWidget extends StatelessWidget {
     );
   }
 }
+Future<bool?> showSavePicDialog(BuildContext context) async{
+  return showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('保存图片',style: MemoStyle.titleTextStyle),
+      content: Text('是否要保存此图片？', style: MemoStyle.bodyTextStyle),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context, false); // 关闭弹窗
+          },
+          child: Text('取消', style: MemoStyle.dialogButtonTextStyle),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context, true); // 关闭弹窗
+          },
+          child: Text('保存', style: MemoStyle.dialogButtonTextStyle),
+        ),
+      ],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      backgroundColor: Colors.white,
+    ),
 
+  );
+}
 Future<bool?> showDeleteDialog(BuildContext context) async {
   return showDialog<bool>(
     context: context,
