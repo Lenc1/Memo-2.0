@@ -292,29 +292,16 @@ Future<bool?> showSavePicDialog(BuildContext context) async{
 
   );
 }
+Future<bool?> showCompressDialog(BuildContext context) async{
+  return showDialog<bool>(
+      context: context,
+      builder: (context) => const MemoBoolAskPop(title: '导出确认', content: '导出后是否保留现有memo', action1: '保留', action2: '清空')
+  );
+}
 Future<bool?> showDeleteDialog(BuildContext context) async {
   return showDialog<bool>(
     context: context,
-    builder: (context) => AlertDialog(
-      title: Text("确认删除", style: MemoStyle.titleTextStyle),
-      content: Text("确定要删除这条memo吗？", style: MemoStyle.bodyTextStyle),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text("取消", style: MemoStyle.dialogButtonTextStyle),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, true),
-          child: Text("删除",
-              style: MemoStyle.dialogButtonTextStyle.copyWith(color: Colors.red)
-          ),
-        ),
-      ],
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      backgroundColor: Colors.white,
-    ),
+    builder: (context) => const MemoBoolAskPop(title: '删除确认', content: '是否删除这条memo？', action1: '取消', action2: '删除')
   );
 }
 final Map<DateTime, int> heatmapData = {
@@ -377,7 +364,61 @@ class MemoBackButton extends StatelessWidget {
     );
   }
 }
+class MemoBoolAskPop extends StatelessWidget {
+  final String title;
+  final String content;
+  final String action1;
+  final String action2;
+  const MemoBoolAskPop({super.key,required this.title,required this.content,required this.action1,required this.action2});
 
+  @override
+  Widget build(BuildContext context) {
+    return  AlertDialog(
+      title: Text(
+        title,
+        style: MemoStyle.titleTextStyle.copyWith(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      content: Text(
+        content,
+        style: MemoStyle.bodyTextStyle.copyWith(
+          fontSize: 16,
+          color: Colors.grey[700],
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Color.fromRGBO(64, 185, 222, 1),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+            ),
+          ),
+          child: Text(action1,style: MemoStyle.dialogButtonTextStyle,),
+          onPressed: () => Navigator.pop(context,false),
+        ),
+        TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Color.fromRGBO(64, 185, 222, 1),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+            ),
+          ),
+          child: Text(action2,style: MemoStyle.dialogButtonTextStyle.copyWith(color:Colors.red),),
+          onPressed: () => Navigator.pop(context,true),
+        ),
+      ],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      backgroundColor: Colors.white,
+    );
+  }
+}
 class MemoReminderPop extends StatelessWidget {
   final String title;
   final String content;
