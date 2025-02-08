@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:memo_program/models/config_list.dart';
@@ -91,14 +92,36 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: InkWell(
                             onTap: () async {
                               switch (config.configRoute) {
-                                case '1':
-                                  String? path = await PathManager.pickPath();
-                                  if (path != null) {
-                                    print("选择的路径是：$path");
-                                  } else {
-                                    print("没有选择文件夹");
-                                  }
-                                  break; // 加上 break 语句
+                                case '2':
+                                  String? result = await PathManager.pickPath();
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return MemoReminderPop(title: '提醒', content: result, action: '确认',
+                                        );
+                                      });
+                                  break;
+                                case '3':
+                                  final confirm = await showCompressDialog(context);
+                                  String? result =
+                                      await PathManager.pressMemo(confirm);
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return MemoReminderPop(title: '提醒', content: result, action: '确认',
+                                        );
+                                      });
+                                  break;
+                                case '4':
+                                  String? result =
+                                  await PathManager.extractMemo();
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return MemoReminderPop(title: '提醒', content: result, action: '确认',
+                                        );
+                                      });
+                                  break;
                                 default:
                                   print("无效的路径");
                               }
@@ -111,9 +134,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                   height: 28,
                                   decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: Svg(config.configIcon),
-                                        fit: BoxFit.cover,
-                                      )),
+                                    image: Svg(config.configIcon),
+                                    fit: BoxFit.cover,
+                                  )),
                                 ),
                                 const SizedBox(width: 17),
                                 Text(
