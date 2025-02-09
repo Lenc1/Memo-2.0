@@ -11,7 +11,7 @@ class UserAvatar extends StatelessWidget {
       decoration: BoxDecoration(
           shape: BoxShape.circle,
           image: const DecorationImage(
-            image: AssetImage('lib/assets/avator.jpg'),
+            image: AssetImage('lib/assets/avatar.jpg'),
             fit: BoxFit.cover,
           ),
           boxShadow: [
@@ -33,4 +33,17 @@ class UserName extends StatelessWidget {
     );
   }
 }
+class UserSign extends StatelessWidget {
+
+  final TextStyle style;
+  const UserSign({super.key,required this.style});
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      '香橙味全能糕手',
+      style: style,
+    );
+  }
+}
+
 

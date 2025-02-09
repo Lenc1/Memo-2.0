@@ -1,5 +1,3 @@
-import 'dart:io';
-
 class Memo {
   String title;
   String content;

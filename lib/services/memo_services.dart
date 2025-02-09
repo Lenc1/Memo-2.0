@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:archive/archive.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -174,7 +173,7 @@ class PathManager {
       final zipFilePath = path.join(directoryPath, 'memo_archive_${now.millisecondsSinceEpoch}.zip');
 
       final zipData = ZipEncoder().encode(archive);
-      await File(zipFilePath).writeAsBytes(zipData!);
+      await File(zipFilePath).writeAsBytes(zipData);
 
       debugPrint('ZIP file created at: $zipFilePath');
       if(key ?? false) clearMemoFolder();

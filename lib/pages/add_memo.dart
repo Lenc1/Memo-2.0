@@ -1,6 +1,6 @@
 // add_memo.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+//import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memo_program/services/memo_services.dart';
@@ -69,7 +69,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
 
   Future<void> _pickImages() async {
     final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles != null && pickedFiles.length+_images.length <= 3) {
+    if (pickedFiles.length+_images.length <= 3) {
       setState(() {
         _images.addAll(pickedFiles.map((e)=>File(e.path)));
       });
@@ -83,10 +83,8 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       );
     }
   }
-
-  String _inputText = '';
   bool _isEditing = true;
-
+  String? _inputText;
   @override
   Widget build(BuildContext context) {
     return Scaffold(

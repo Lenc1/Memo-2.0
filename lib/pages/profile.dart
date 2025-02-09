@@ -18,7 +18,6 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
-    String directoryPath;
     return Scaffold(
       backgroundColor: const Color.fromRGBO(240, 251, 255, 1),
       body: Align(
@@ -41,7 +40,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     margin: const EdgeInsets.only(top: 32, left: 14),
                     decoration: const BoxDecoration(
                         image: DecorationImage(
-                            image: AssetImage('lib/assets/backfile.png'),
+                            image: AssetImage('lib/assets/backFile.png'),
                             fit: BoxFit.cover)),
                   ), // 底层黑文件夹
                   Container(
@@ -67,7 +66,33 @@ class _ProfilePageState extends State<ProfilePage> {
                   Container(
                     margin: const EdgeInsets.only(top: 54, left: 256),
                     child: const UserAvatar(),
-                  ), // 头像
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 99, left: 56),
+                    child: Text('昵称:',style: MemoStyle.bodyHintTextStyle.copyWith(
+                        color: const Color.fromRGBO(82, 82, 82, 1),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 128, left: 56),
+                    child: Text('性别:',style: MemoStyle.bodyHintTextStyle.copyWith(
+                        color: const Color.fromRGBO(82, 82, 82, 1),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top:130,left:107),
+                    child: const Icon(Icons.male,color: Color.fromRGBO(122, 184, 245, 1),),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top:164,left:56),
+                    child: UserSign(style: MemoStyle.bodyHintTextStyle),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 99,left: 107),
+                    child: UserName(style: MemoStyle.titleTextStyle),
+                  )// 头像
                 ],
               ),
             ),
@@ -92,6 +117,11 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: InkWell(
                             onTap: () async {
                               switch (config.configRoute) {
+                                case '1':
+                                  showDialog(context: context, builder: (BuildContext context){
+                                    return const MemoReminderPop(title: '提醒', content: '当前内容未完成', action: '确认');
+                                  });
+                                      break;
                                 case '2':
                                   String? result = await PathManager.pickPath();
                                   showDialog(

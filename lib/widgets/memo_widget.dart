@@ -305,9 +305,9 @@ Future<bool?> showDeleteDialog(BuildContext context) async {
   );
 }
 final Map<DateTime, int> heatmapData = {
-  DateTime.now().subtract(Duration(days: 5)): 2,
-  DateTime.now().subtract(Duration(days: 8)): 4,
-  DateTime.now().subtract(Duration(days: 15)): 1,
+  DateTime.now().subtract(const Duration(days: 5)): 2,
+  DateTime.now().subtract(const Duration(days: 8)): 4,
+  DateTime.now().subtract(const Duration(days: 15)): 1,
 };
 
 class MyHeatMap extends StatelessWidget {
@@ -391,7 +391,7 @@ class MemoBoolAskPop extends StatelessWidget {
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
-            foregroundColor: Color.fromRGBO(64, 185, 222, 1),
+            foregroundColor: const Color.fromRGBO(64, 185, 222, 1),
             textStyle: const TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 16,
@@ -402,7 +402,7 @@ class MemoBoolAskPop extends StatelessWidget {
         ),
         TextButton(
           style: TextButton.styleFrom(
-            foregroundColor: Color.fromRGBO(64, 185, 222, 1),
+            foregroundColor: const Color.fromRGBO(64, 185, 222, 1),
             textStyle: const TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 16,
@@ -445,7 +445,7 @@ class MemoReminderPop extends StatelessWidget {
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
-            foregroundColor: Color.fromRGBO(64, 185, 222, 1),
+            foregroundColor: const Color.fromRGBO(64, 185, 222, 1),
             textStyle: const TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 16,

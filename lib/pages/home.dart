@@ -7,7 +7,7 @@ import 'package:memo_program/styles/memo_style.dart';
 import 'package:memo_program/widgets/user_widget.dart';
 import 'package:memo_program/services/memo_services.dart';
 
-import 'package:path_provider/path_provider.dart';
+//import 'package:path_provider/path_provider.dart';
 import '../config/memo_config.dart';
 import '../widgets/memo_widget.dart';
 import 'check_memo.dart';
