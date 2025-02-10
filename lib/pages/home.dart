@@ -107,10 +107,10 @@ class _MyHomePageState extends State<MyHomePage> {
       backgroundColor: const Color.fromRGBO(240, 251, 255, 1),
       body: Column(
         children: [
-          Container(
-            margin: const EdgeInsets.only(top: 10,left: 20),
-            child: Text('Width:$screenWidth'),
-          ),
+          // Container(
+          //   margin: const EdgeInsets.only(top: 10,left: 20),
+          //   child: Text('Width:$screenWidth~memo:${_memo.length}'),
+          // ),
           Container(
             width: screenWidth - 30,
             height: 307,
@@ -208,7 +208,9 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           Expanded(
-            child: Align(
+
+            child:_memo.isNotEmpty
+                ? Align(
                 alignment: Alignment.topCenter,
                 child: ValueListenableBuilder(
                     valueListenable: MemoConfig.refresh,
@@ -222,7 +224,20 @@ class _MyHomePageState extends State<MyHomePage> {
                         onPressed: (memo) =>
                             _navigateToCheckMemoPage(context, memo),
                       );
-                    })),
+                    }))
+                :Container(
+              width: screenWidth-30,
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  borderRadius: BorderRadius.circular(18)
+                ),
+                child: Container(
+                width: screenWidth*0.8,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(image: AssetImage('lib/assets/nomemo_placehoder.png'))
+              ),
+            ))
+            ,
           ),
         ],
       ),

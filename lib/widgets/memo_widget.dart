@@ -66,7 +66,7 @@ class NewMemoWidget extends StatelessWidget {
                       height: 38,
                       decoration: const BoxDecoration(
                         image: DecorationImage(
-                          image: Svg('lib/assets/addition_fill.svg'),
+                          image: AssetImage('lib/assets/addition_fill.png'),
                           fit: BoxFit.cover,
                         ),
                       ),

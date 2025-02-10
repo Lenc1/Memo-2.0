@@ -5,19 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as path;
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import '../models/memo.dart';
 import '../widgets/memo_widget.dart';
 
 class CURDManager {
+  //TODO 图片存储逻辑修改：只存储图片文件名，不保存绝对路径
   static Future<void> savePicture(
     String originPath,
   ) async {
     final targetPath = await FilePicker.platform.getDirectoryPath();
     final now = DateTime.now();
+    final picSec = now.millisecondsSinceEpoch.toString();
     if (targetPath != null) {
       String optPath = path.join(targetPath,
-          'memoPic_${now.millisecondsSinceEpoch.toString()}.${originPath.split('.').last}');
+          'memoPic_$picSec.${originPath.split('.').last}');
       try {
         print(originPath);
         print(targetPath);
@@ -62,6 +65,15 @@ class CURDManager {
     List<File> images,
     Memo? memo, // 传递原始memo（如果是编辑模式）
   ) async {
+    var status = await Permission.storage.status;
+    if(status.isDenied) {
+      status = await Permission.storage.request();
+    }
+    if(status.isGranted){
+
+    } else if(status.isPermanentlyDenied){
+      openAppSettings();
+    }
     if (controller.text.isNotEmpty) {
       final now = DateTime.now();
       List<String> imagePaths = [];

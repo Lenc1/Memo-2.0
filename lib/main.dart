@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:memo_program/pages/home.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
@@ -13,7 +14,7 @@ void main() async {
         );
     //windowManager.setResizable(false); //是否可以缩放
   }
-
+  await requestStoragePermission();
   runApp(const MyApp());
 }
 
@@ -35,5 +36,17 @@ class MyApp extends StatelessWidget {
       ),
       home: const MyHomePage(title: 'Memo'),
     );
+  }
+}
+Future<void> requestStoragePermission() async {
+  var status = await Permission.storage.status;
+  if (status.isDenied) {
+    status = await Permission.storage.request();
+  }
+
+  if (status.isGranted) {
+    print('Storage permission granted');
+  } else if (status.isPermanentlyDenied) {
+    openAppSettings();
   }
 }
