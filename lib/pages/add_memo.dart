@@ -1,13 +1,10 @@
-// add_memo.dart
 import 'package:flutter/material.dart';
-//import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/widgets/memo_widget.dart';
 import 'dart:io';
 import 'package:memo_program/styles/memo_style.dart';
-
 import '../models/memo.dart';
 import '../widgets/image_view.dart';
 
@@ -26,8 +23,9 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
   final ImagePicker _picker = ImagePicker();
   List<File> _images = [];
   bool _isCheck = false;
-  bool isWindows = Platform.isWindows;
+  bool _isEditing = true;
   String viewPic = '';
+  bool isWindows = Platform.isWindows;
 
   @override
   void initState() {
@@ -49,7 +47,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
     if (image != null) {
       setState(() {
-        _images.add(File(image.path)); // 新图片添加到现有图片列表中
+        _images.add(File(image.path));
       });
     }
   }
@@ -69,9 +67,9 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
 
   Future<void> _pickImages() async {
     final pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles.length+_images.length <= 3) {
+    if (pickedFiles.length + _images.length <= 3) {
       setState(() {
-        _images.addAll(pickedFiles.map((e)=>File(e.path)));
+        _images.addAll(pickedFiles.map((e) => File(e.path)));
       });
     } else {
       showDialog(
@@ -83,310 +81,279 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       );
     }
   }
-  bool _isEditing = true;
-  String? _inputText;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        resizeToAvoidBottomInset: false, //关键一行，优化溢出
-        backgroundColor: MemoStyle.memoBackGroundColor,
-        body: Align(
-          alignment: Alignment.topCenter,
-          child: Stack(children: [
-            Container(
-              margin: const EdgeInsets.only(top: 50),
-              decoration: MemoStyle.cardDecoration,
-              child: Column(
-                children: [
-                  Column(
-                    children: <Widget>[
-                      Row(
-                        children: [
-                          InkWell(
-                              onTap: () {
-                                print("back");
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                margin:
-                                    const EdgeInsets.only(top: 37, left: 54),
-                                child: const MemoBackButton(),
-                              )),
-                          Container(
-                            margin: const EdgeInsets.only(top: 37, left: 150),
-                            child: IconButton(
-                              icon: Icon(
-                                  _isEditing ? Icons.menu_book : Icons.edit),
-                              onPressed: () {
-                                setState(() {
-                                  _isEditing = !_isEditing;
-                                });
-                              },
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(left: 20, top: 36),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                CURDManager.saveMemo(
-                                  context,
-                                  _controller,
-                                  _titleController,
-                                  _images,
-                                  widget.memo,
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color.fromRGBO(64, 185, 222, 1),
-                                padding:
-                                    const EdgeInsets.only(left: 17, right: 17),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                              ),
-                              child: Text(
-                                '保存',
-                                style: MemoStyle.bodyTextStyle.copyWith(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        margin:
-                            const EdgeInsets.only(top: 12, left: 51, right: 51),
-                        child: TextField(
-                          maxLines: 1,
-                          maxLength: 12,
-                          style: MemoStyle.titleTextStyle,
-                          controller: _titleController,
-                          onChanged: (text) {
-                            setState(() {
-                              print('input...');
-                            });
-                          },
-                          decoration: const InputDecoration(
-                            hintText: '标题',
-                            hintStyle: TextStyle(
-                              color: Color.fromRGBO(130, 130, 130, 1),
-                            ),
-                            border: InputBorder.none, //取消下划线
-                            counterText: '', //隐藏原版字符数显示
-                          ),
-                        ),
-                      ),
-                      Container(
-                          margin: const EdgeInsets.only(
-                            left: 51,
-                            right: 51,
-                            bottom: 20,
-                          ),
-                          child: const Divider(
-                            height: 1,
-                            color: Color.fromRGBO(200, 200, 200, 1),
-                            thickness: 1,
-                          )),
-                      Container(
-                        margin: const EdgeInsets.only(left: 51, right: 51),
-                        child: Column(
-                          children: [
-                            _isEditing
-                                ? TextField(
-                                    maxLines: 11,
-                                    style: MemoStyle.bodyTextStyle,
-                                    controller: _controller,
-                                    onChanged: (text) {
-                                      setState(() {
-                                        print("_inputText");
-                                        _inputText = text;
-                                      });
-                                    },
-                                    decoration: InputDecoration(
-                                      hintText: '在此输入文字...',
-                                      hintStyle: MemoStyle.bodyHintTextStyle,
-                                      border: InputBorder.none, //取消下划线
-                                    ),
-                                    // TODO: markdown显示
-                                  )
-                                : const Expanded(
-                                    child: SingleChildScrollView(
-                                        // child: Markdown(
-                                        //   data: _inputText,
-                                        //   styleSheet: MarkdownStyleSheet(
-                                        //     h1: TextStyle(fontSize: 14),
-                                        //   ),
-                                        // ),
-                                        ))
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 50),
-                      Stack(children: [
-                        //ClipRRect(child: const SizedBox(height: 150),),
-                        if (_images.isNotEmpty) ...[
-                          Container(
-                              height: 95,
-                              margin: const EdgeInsets.only(left: 31),
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal, // 横向滚动
-                                itemCount: _images.length,
-                                itemBuilder: (context, index) {
-                                  return Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 5), // 水平间距
-                                    child: AspectRatio(
-                                      aspectRatio: 1,
-                                      child: Stack(
-                                        alignment: Alignment.topRight,
-                                        children: [
-                                          Container(
-                                            height: 95,
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              child: Image.file(
-                                                _images[index],
-                                                fit: BoxFit.fill,
-                                              ),
-                                            ),
-                                          ),
-                                          InkWell(
-                                            onTap: () =>
-                                                _viewImage(_images[index].path),
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color: Colors.black
-                                                    .withOpacity(0.4), // 半透明黑色
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            width: 20,
-                                            height: 20,
-                                            margin: const EdgeInsets.all(5),
-                                            child: InkWell(
-                                              onTap: () => _removeImage(index),
-                                              child: const Icon(
-                                                Icons.close,
-                                                size: 16,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              )),
-                        ],
-                      ]),
-                      const SizedBox(height: 10),
-                      const Divider(
-                        height: 1,
-                        color: Color.fromRGBO(200, 200, 200, 1),
-                        thickness: 1,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (!isWindows)
-                            InkWell(
-                              onTap: _takePicture,
-                              child: Container(
-                                alignment: Alignment.topLeft,
-                                width: 140,
-                                margin:
-                                    const EdgeInsets.only(top: 10, left: 51),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 29,
-                                      height: 29,
-                                      decoration: const BoxDecoration(
-                                          image: DecorationImage(
-                                              image: Svg(
-                                                  'lib/assets/camera.svg'))),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      '拍照上传',
-                                      style: MemoStyle.bodyHintTextStyle,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          if(_images.length<3)
-                          InkWell(
-                            onTap: () {
-                              print("picking Image...");
-                              _pickImages();
-                            },
-                            child: Container(
-                              alignment: Alignment.topLeft,
-                              width: 150,
-                              margin: const EdgeInsets.only(top: 10, left: 51),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: 29,
-                                    height: 29,
-                                    decoration: const BoxDecoration(
-                                        image: DecorationImage(
-                                            image: Svg(
-                                                'lib/assets/photos.svg'))),
-                                  ),
-                                  const SizedBox(
-                                    width: 8,
-                                  ),
-                                  Text(
-                                    _images.isEmpty ? '上传照片' : '继续上传',
-                                    style: MemoStyle.bodyHintTextStyle,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+      resizeToAvoidBottomInset: false,
+      backgroundColor: MemoStyle.memoBackGroundColor,
+      body: _buildMainLayout(),
+    );
+  }
+
+  Widget _buildMainLayout() {
+    return Stack(
+      children: [
+        // 主内容卡片
+        Positioned.fill(
+          top: 50,
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: MemoStyle.cardDecoration,
+            child: Column(
+              children: [
+                _buildHeaderSection(),
+                _buildTitleSection(),
+                _buildContentSection(),
+                _buildImageSection(),
+                _buildBottomActions(),
+              ],
             ),
-            Container(
-              margin: const EdgeInsets.only(top: 160, left: 290),
-              child: Text(
-                '${_titleController.text.length}/12',
-                style: MemoStyle.bodyHintTextStyle,
-              ),
+          ),
+        ),
+        // 悬浮统计信息
+        _buildFloatingCounters(),
+        // 图片查看器
+        if (_isCheck) _buildImageViewer(),
+      ],
+    );
+  }
+
+  Widget _buildHeaderSection() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildBackButton(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _buildEditToggle(),
+              _buildSaveButton(),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackButton() {
+    return  InkWell(
+      child: IconButton(
+        icon: const MemoBackButton(),
+        onPressed: () => Navigator.pop(context),
+      ),
+    );
+  }
+
+  Widget _buildEditToggle() {
+    return IconButton(
+      icon: Icon(_isEditing ? Icons.menu_book : Icons.edit),
+      onPressed: () => setState(() => _isEditing = !_isEditing),
+    );
+  }
+  Widget _buildSaveButton() {
+    return SizedBox(
+      width: 82,
+      child: ElevatedButton(
+        onPressed: () => CURDManager.saveMemo(
+          context,
+          _controller,
+          _titleController,
+          _images,
+          widget.memo,
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color.fromRGBO(64, 185, 222, 1),
+          shape: RoundedRectangleBorder(borderRadius:  BorderRadius.circular(15)),
+        ),
+        child: Text(
+          '保存',
+          maxLines: 1,
+          style: MemoStyle.bodyTextStyle.copyWith(fontSize: 14,color: Colors.white),
+        ),
+      ),
+    );
+  }
+  Widget _buildTitleSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        children: [
+          TextField(
+            onChanged:(text){
+              setState(() {});
+            },
+            controller: _titleController,
+            style: MemoStyle.titleTextStyle,
+            maxLines: 1,
+            maxLength: 12,
+            decoration: InputDecoration(
+              hintText: '标题',
+              hintStyle: MemoStyle.bodyHintTextStyle,
+              border: InputBorder.none,
+              counterText: '',
             ),
-            Container(
-              margin: const EdgeInsets.only(top: 530, left: 290),
-              child: Text(
-                '字数:${_controller.text.length}',
-                style: MemoStyle.bodyHintTextStyle.copyWith(
-                  fontSize: 16,
+          ),
+          const Divider(height: 1, color: Color.fromRGBO(200, 200, 200, 1)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContentSection() {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: _isEditing
+            ? TextField(
+                onChanged: (text){
+                  setState(() {});
+                },
+                controller: _controller,
+                maxLines: 11,
+                style: MemoStyle.bodyTextStyle,
+                decoration: InputDecoration(
+                  hintText: '在此输入文字...',
+                  hintStyle: MemoStyle.bodyHintTextStyle,
+                  border: InputBorder.none,
                 ),
+              )
+            : SingleChildScrollView(
+            child: Text(
+              _controller.text,
+              maxLines: 11,
+              style: MemoStyle.bodyTextStyle,
+            )),
+      ),
+    );
+  }
+
+  Widget _buildImageSection() {
+    return Column(
+      children: [
+        if (_images.isNotEmpty) _buildImageList(),
+        const Divider(height: 1, color: Color.fromRGBO(200, 200, 200, 1)),
+      ],
+    );
+  }
+
+  Widget _buildImageList() {
+    return SizedBox(
+      height: 150,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _images.length,
+        padding: const EdgeInsets.only(left: 24, top: 8, bottom: 8),
+        itemBuilder: (context, index) => _buildImageItem(index),
+      ),
+    );
+  }
+  Widget _buildImageItem(int index) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Stack(
+        children: [
+          GestureDetector(
+            onTap: () => _viewImage(_images[index].path),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.file(_images[index],
+                  width: 95, height: 95, fit: BoxFit.cover),
+            ),
+          ),
+          Positioned(
+            top: 4,
+            right: 4,
+            child: GestureDetector(
+              onTap: () => _removeImage(index),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(2),
+                child: const Icon(Icons.close, size: 16, color: Colors.white),
               ),
             ),
-            if (_isCheck)
-              InkWell(
-                  onTap: _closeImageViewer,
-                  child: ImageViewerBuilder(
-                    path: viewPic,
-                  ))
-          ]),
-        ));
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomActions() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          if(!isWindows) _buildCameraButton(),
+          if (_images.length < 3) _buildGalleryButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCameraButton() {
+    return _buildIconButton(
+      icon: 'lib/assets/camera.svg',
+      label: '拍照上传',
+      onTap: _takePicture,
+    );
+  }
+
+  Widget _buildGalleryButton() {
+    return _buildIconButton(
+      icon: 'lib/assets/photos.svg',
+      label: _images.isEmpty ? '上传照片' : '继续上传',
+      onTap: _pickImages,
+    );
+  }
+
+  Widget _buildIconButton(
+      {required String icon,
+      required String label,
+      required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Row(
+        children: [
+          ImageIcon(Svg(icon), size: 24, color: Colors.grey[600]),
+          const SizedBox(width: 8),
+          Text(label, style: MemoStyle.bodyHintTextStyle),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFloatingCounters() {
+    return Positioned(
+      top: 140,
+      right: 50,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text('${_titleController.text.length}/12',
+              style: MemoStyle.bodyHintTextStyle),
+          const SizedBox(height: 370),
+          Text('字数:${_controller.text.length}',
+              style: MemoStyle.bodyHintTextStyle),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageViewer() {
+    return InkWell(
+      onTap: _closeImageViewer,
+      child: Container(
+        color: const Color.fromRGBO(0, 0, 0, 0.25),
+        child: Center(
+          child: ImageViewerBuilder(path: viewPic),
+        ),
+      ),
+    );
   }
 }

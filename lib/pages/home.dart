@@ -15,6 +15,7 @@ import 'profile.dart';
 import 'add_memo.dart';
 
 class MyHomePage extends StatefulWidget {
+
   const MyHomePage({super.key, required this.title});
 
   final String title;
@@ -100,20 +101,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromRGBO(240, 251, 255, 1),
       body: Column(
         children: [
           Container(
-            width: 392,
+            margin: const EdgeInsets.only(top: 10,left: 20),
+            child: Text('Width:$screenWidth'),
+          ),
+          Container(
+            width: screenWidth - 30,
             height: 307,
             margin: const EdgeInsets.only(top: 50),
             decoration: MemoStyle.cardDecoration,
             child: Stack(
               children: [
                 Container(
-                  width: 253,
                   height: 73,
                   margin: const EdgeInsets.only(left: 12, top: 26, right: 121),
                   decoration: BoxDecoration(
@@ -144,9 +149,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              const Text(
-                                '已使用 Memo 280 天',
-                                style: TextStyle(
+                               Text(
+                                screenWidth>370?'已使用 Memo 280 天':'',
+                                style: const TextStyle(
                                   fontFamily: 'SourceHanSans',
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -160,8 +165,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(top: 65, left: 320),
+                Positioned(
+                  right: 25,
+                    child: Container(
+                  margin: const EdgeInsets.only(top: 65),
                   child: ValueListenableBuilder<bool>(
                     valueListenable: MemoConfig.showHeatMap,
                     builder: (context, showHeatMap, child) {
@@ -178,6 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       );
                     },
                   ),
+                )
                 ),
                 const SizedBox(height: 24),
                 Container(

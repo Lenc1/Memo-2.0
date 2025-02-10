@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
-import 'package:memo_program/models/config_list.dart';
+import 'package:memo_program/config/config_list.dart';
 import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/styles/memo_style.dart';
 import 'package:memo_program/widgets/user_widget.dart';

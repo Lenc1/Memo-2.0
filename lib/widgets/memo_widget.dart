@@ -10,19 +10,23 @@ import '../services/memo_services.dart';
 import '../styles/memo_style.dart';
 
 class NewMemoWidget extends StatelessWidget {
+
   String _getCurrentDate() {
     DateTime now = DateTime.now();
     return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
   }
 
-  const NewMemoWidget({super.key,required this.onPressed});
+  const NewMemoWidget({super.key, required this.onPressed});
 
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
+
+    var screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      width: 363,
+
+      width: screenWidth,
       height: 156,
       margin: const EdgeInsets.only(right: 11, left: 12),
       decoration: BoxDecoration(
@@ -44,33 +48,50 @@ class NewMemoWidget extends StatelessWidget {
         child: Stack(
           alignment: Alignment.topLeft,
           children: [
-            Container(
-              width: 173,
-              height: 54,
-              margin: const EdgeInsets.only(left: 20, top: 48),
-              decoration: BoxDecoration(
-                color: const Color.fromRGBO(156, 204, 219, 1),
-                borderRadius: BorderRadius.circular(14),
-              ),
+            Positioned(
+              right: screenWidth > 440 ? 180 : screenWidth - 250,
               child: Container(
-                margin: const EdgeInsets.only(left: 54, top: 16),
-                child: const Text(
-                  '添加Memo',
-                  style: TextStyle(
-                    fontFamily: 'SourceHanSans',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                  ),
+                width: 180,
+                height: 54,
+                margin: const EdgeInsets.only(top: 48),
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(156, 204, 219, 1),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 10),
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: Svg('lib/assets/addition_fill.svg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      screenWidth < 410 ? '' : '添加Memo',
+                      style: const TextStyle(
+                        fontFamily: 'SourceHanSans',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            Container(
-              width: 196,
-              height: 130,
-              margin: const EdgeInsets.only(
-                  top: 13, right: 12, left: 155, bottom: 13),
-              decoration: BoxDecoration(
+            Positioned(
+              right: 0,
+              child: Container(
+                width: 196,
+                height: 130,
+                margin: const EdgeInsets.only(top: 13, right: 12, bottom: 13),
+                decoration: BoxDecoration(
                   color: const Color.fromRGBO(255, 255, 255, 1),
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: const [
@@ -80,44 +101,41 @@ class NewMemoWidget extends StatelessWidget {
                       blurRadius: 4,
                       spreadRadius: 0,
                     ),
-                  ]),
-              child: Container(
-                margin: const EdgeInsets.only(top: 24, left: 22, bottom: 68),
-                child: Text(
-                  _getCurrentDate(),
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
+                  ],
+                ),
+                child: Container(
+                  margin: const EdgeInsets.only(top: 24, left: 22, bottom: 68),
+                  child: Text(
+                    _getCurrentDate(),
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
                 ),
               ),
             ),
-            Container(
-              width: 38,
-              height: 38,
-              margin: const EdgeInsets.only(top: 56, left: 32),
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: Svg('lib/assets/addition_fill.svg'),
-                  fit: BoxFit.cover,
+            Positioned(
+              right: 20,
+              child: Container(
+                width: 35,
+                height: 35,
+                margin: const EdgeInsets.only(top: 5),
+                decoration: const BoxDecoration(
+                  image: DecorationImage(image: AssetImage('lib/assets/tag.png')),
                 ),
               ),
             ),
-            Container(
-              width: 35,
-              height: 35,
-              margin: const EdgeInsets.only(top: 5, left: 290),
-              decoration: const BoxDecoration(
-                  image:
-                      DecorationImage(image: AssetImage('lib/assets/tag.png'))),
-            ),
-            Container(
-              width: 60,
-              height: 70,
-              margin: const EdgeInsets.only(top: 73, left: 261),
-              decoration: const BoxDecoration(
-                  image:
-                      DecorationImage(image: AssetImage('lib/assets/pen.png'))),
+            Positioned(
+              right: 30,
+              child: Container(
+                width: 60,
+                height: 70,
+                margin: const EdgeInsets.only(top: 73),
+                decoration: const BoxDecoration(
+                  image: DecorationImage(image: AssetImage('lib/assets/pen.png')),
+                ),
+              ),
             ),
           ],
         ),
@@ -130,10 +148,15 @@ class MemoListViewBuilder extends StatelessWidget {
   final List<Memo> memos;
   final void Function(Memo) onPressed;
 
-  const MemoListViewBuilder({super.key,required this.memos, required this.onPressed});
+  const MemoListViewBuilder({
+    super.key,
+    required this.memos,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return ListView.builder(
       itemCount: memos.length,
       itemBuilder: (context, index) {
@@ -146,99 +169,113 @@ class MemoListViewBuilder extends StatelessWidget {
               extentRatio: 0.25,
               children: [
                 SlidableAction(
-                  onPressed: (context) async{
+                  onPressed: (context) async {
                     await CURDManager.handleDeleteMemo(
                       context: context,
                       memo: memo,
-                      onSuccess:  MemoConfig.toggleRefresh,
+                      onSuccess: MemoConfig.toggleRefresh,
                     );
                   },
                   backgroundColor: const Color.fromRGBO(255, 73, 73, 1),
-                  foregroundColor: Colors.white,
-                  icon: Icons.delete,
+                  //foregroundColor: Colors.white,
+                  //icon: Icons.delete_rounded,
+                  label: '删除',
                   borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+                  autoClose: false,
                 ),
               ],
             ),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Container(
-                width: 392,
-                height: 156,
-                decoration: MemoStyle.cardDecoration,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
-                  onTap: () => onPressed(memo),
-                  child: Stack(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(top: 29, left: 30),
-                        child: Text(
-                          memo.title.length > 10
-                              ? '${memo.title.substring(0, 10)}...'
-                              : memo.title,
-                          overflow: TextOverflow.ellipsis,
-                          style: MemoStyle.titleTextStyle.copyWith(
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(
-                            top: 58, left: 30, right: 154),
-                        child: const Divider(
-                          height: 1,
-                          color: Colors.grey,
-                          thickness: 1,
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(left: 31, top: 63),
-                        child: Text(
-                          memo.content.length > 10
-                              ? '${memo.content.substring(0, 10)}...'
-                              : memo.content,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: MemoStyle.bodyTextStyle.copyWith(
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 105, left: 31),
-                        child: Text(
-                          memo.created_at.substring(0, 10),
-                          style: MemoStyle.bodyHintTextStyle.copyWith(
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 115,
-                        height: 115,
-                        margin: const EdgeInsets.only(top: 16, left: 250),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: [MemoStyle.cardShadow,]),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: memo.images.isEmpty
-                          ?  Container(
-                            decoration: const BoxDecoration(
-                                image: DecorationImage(
-                                    image: AssetImage('lib/assets/memo_placeholder.png'),
-                                  fit: BoxFit.cover,
-                                )
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  width: screenWidth,
+                  height: 156,
+                  decoration: MemoStyle.cardDecoration,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () => onPressed(memo),
+                    child: Stack(
+                      children: [
+                        // 标题
+                        Container(
+                          margin: const EdgeInsets.only(top: 29, left: 30),
+                          child: Text(
+                            memo.title.length > 10
+                                ? '${memo.title.substring(0, 10)}...'
+                                : memo.title,
+                            overflow: TextOverflow.ellipsis,
+                            style: MemoStyle.titleTextStyle.copyWith(
+                              fontSize: 18,
                             ),
-                          )
-                          : Image.file(
-                            File(memo.images[0]),
-                            fit: BoxFit.cover,
                           ),
                         ),
-                      )
-                    ],
+                        // 分割线
+                        Container(
+                          margin: const EdgeInsets.only(top: 58, left: 30, right: 154),
+                          child: const Divider(
+                            height: 1,
+                            color: Colors.grey,
+                            thickness: 1,
+                          ),
+                        ),
+                        // 内容
+                        Container(
+                          margin: const EdgeInsets.only(left: 31, top: 63),
+                          child: Text(
+                            memo.content.length > 10
+                                ? '${memo.content.substring(0, 10)}...'
+                                : memo.content,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: MemoStyle.bodyTextStyle.copyWith(
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        // 创建日期
+                        Container(
+                          margin: const EdgeInsets.only(top: 105, left: 31),
+                          child: Text(
+                            memo.created_at.substring(0, 10),
+                            style: MemoStyle.bodyHintTextStyle.copyWith(
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                        // 图片
+                        Positioned(
+                          right: 25,
+                          child: Container(
+                            width: 115,
+                            height: 115,
+                            margin: const EdgeInsets.only(top: 16),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [MemoStyle.cardShadow],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: memo.images.isEmpty
+                                  ? Container(
+                                decoration: const BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage(
+                                        'lib/assets/memo_placeholder.png'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              )
+                                  : Image.file(
+                                File(memo.images[0]),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -249,6 +286,7 @@ class MemoListViewBuilder extends StatelessWidget {
     );
   }
 }
+
 class DeleteMemoWidget extends StatelessWidget {
   final Memo memo;
   const DeleteMemoWidget({super.key,required this.memo});

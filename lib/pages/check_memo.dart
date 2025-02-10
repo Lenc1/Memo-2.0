@@ -38,55 +38,55 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
   }
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
+    var screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
+      resizeToAvoidBottomInset: false, //关键一行，优化溢出
       backgroundColor: MemoStyle.memoBackGroundColor,
       body: Align(
         alignment: Alignment.topCenter,
         child:Stack(
           children: [
             Container(
-              width: 392,
-              height: 700,
+              height: screenHeight-90,
               margin: const EdgeInsets.only(top: 50),
               decoration: MemoStyle.cardDecoration,
               child: Stack(
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(top: 37, left: 54),
-                        child: InkWell(
-                          onTap: () {
-                            print("back");
-                            Navigator.pop(context);
-                          },
-                          child: const MemoBackButton(),
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 37, left: 230),
-                        child: IconButton(
-                          icon: const Icon(Icons.mode_edit_outline_outlined),
-                          color: const Color.fromRGBO(40, 40, 40, 1),
-                          onPressed: () async {
-                            final newMemo = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => NewDiaryPage(memo: memo),
-                              ),
-                            );
-                            if (newMemo != null) {
-                              setState(() {
-                                memo = newMemo; // 更新 memo 并刷新 UI
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                    ],
+                  Container(
+                    margin: const EdgeInsets.only(top: 37, left: 54),
+                    child: InkWell(
+                      onTap: () {
+                        print("back");
+                        Navigator.pop(context);
+                      },
+                      child: const MemoBackButton(),
+                    ),
                   ),
                   Positioned(
-                    top: 130,left:251,
+                    right: 50,
+                    child: Container(
+                    margin: const EdgeInsets.only(top: 37, left: 230),
+                    child: IconButton(
+                      icon: const Icon(Icons.mode_edit_outline_outlined),
+                      color: const Color.fromRGBO(40, 40, 40, 1),
+                      onPressed: () async {
+                        final newMemo = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NewDiaryPage(memo: memo),
+                          ),
+                        );
+                        if (newMemo != null) {
+                          setState(() {
+                            memo = newMemo; // 更新 memo 并刷新 UI
+                          });
+                        }
+                      },
+                    ),
+                  ),),
+                  Positioned(
+                    top: 130,right: 50,
                       child: SelectableText(
                         memo.created_at.substring(0,10),
                         style: MemoStyle.bodyHintTextStyle.copyWith(
@@ -113,13 +113,13 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                   ),
                   Positioned(
                     top: 80,
-                    left: 305,
+                    right: 50,
                     child: DeleteMemoWidget(memo: memo),
                   ),
                   Positioned(
                     top: 156, left: 51, right: 51,
                     child: SizedBox(
-                      height: 360, // 限制滚动区域
+                      height: screenHeight*0.3, // 限制滚动区域
                       child: SingleChildScrollView(
                         child: SelectableText(
                           memo.content,
@@ -130,7 +130,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                   ),
                   Container(
                     height: 100,
-                    margin: const EdgeInsets.only(top: 580, left: 31),
+                    margin: EdgeInsets.only(top: screenHeight*0.62, left: 31),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: ListView.builder(
@@ -161,7 +161,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                     ),
                   ),
                   Container(
-                    margin: const EdgeInsets.only(top: 560),
+                    margin: EdgeInsets.only(top: screenHeight*0.6),
                     child: const Divider(
                       height: 1,
                       color: Color.fromRGBO(200, 200, 200, 1),
@@ -183,7 +183,6 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                       debugPrint('保存图片遇到错误: $e');
                     }
                   }
-
                 },
                 onTap: _closeImageViewer,
                 child: ImageViewerBuilder(
