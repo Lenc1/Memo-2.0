@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:memo_program/pages/add_memo.dart';
 import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/widgets/image_view.dart';
+import 'package:path/path.dart' as path;
 import 'package:memo_program/widgets/memo_widget.dart';
 import 'package:memo_program/styles/memo_style.dart';
 import '../models/memo.dart';
 
 class MemoCheckPage extends StatefulWidget {
   final Memo memo;
-  const MemoCheckPage({super.key, required this.memo});
+  final String imgPath;
+  const MemoCheckPage({super.key, required this.memo,required this.imgPath});
 
   @override
   _MemoCheckPageState createState() => _MemoCheckPageState();
@@ -19,11 +21,13 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
   late Memo memo;
   bool _isCheck = false;
   String viewPic = '';
+  String imgPath ='';
   @override
   void initState() {
     super.initState();
     memo = widget.memo;
     viewPic = widget.memo.images.isNotEmpty ? widget.memo.images[0] : '';
+    imgPath = widget.imgPath;
   }
   void _viewImage(String path) {
     setState(() {
@@ -38,55 +42,55 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
   }
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
+    var screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
+      resizeToAvoidBottomInset: false, //关键一行，优化溢出
       backgroundColor: MemoStyle.memoBackGroundColor,
       body: Align(
         alignment: Alignment.topCenter,
         child:Stack(
           children: [
             Container(
-              width: 392,
-              height: 700,
+              height: screenHeight-90,
               margin: const EdgeInsets.only(top: 50),
               decoration: MemoStyle.cardDecoration,
               child: Stack(
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(top: 37, left: 54),
-                        child: InkWell(
-                          onTap: () {
-                            print("back");
-                            Navigator.pop(context);
-                          },
-                          child: const MemoBackButton(),
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 37, left: 230),
-                        child: IconButton(
-                          icon: const Icon(Icons.mode_edit_outline_outlined),
-                          color: const Color.fromRGBO(40, 40, 40, 1),
-                          onPressed: () async {
-                            final newMemo = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => NewDiaryPage(memo: memo),
-                              ),
-                            );
-                            if (newMemo != null) {
-                              setState(() {
-                                memo = newMemo; // 更新 memo 并刷新 UI
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                    ],
+                  Container(
+                    margin: const EdgeInsets.only(top: 37, left: 54),
+                    child: InkWell(
+                      onTap: () {
+                        print("back");
+                        Navigator.pop(context);
+                      },
+                      child: const MemoBackButton(),
+                    ),
                   ),
                   Positioned(
-                    top: 130,left:251,
+                    right: 50,
+                    child: Container(
+                    margin: const EdgeInsets.only(top: 37, left: 230),
+                    child: IconButton(
+                      icon: const Icon(Icons.mode_edit_outline_outlined),
+                      color: const Color.fromRGBO(40, 40, 40, 1),
+                      onPressed: () async {
+                        final newMemo = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => NewDiaryPage(memo: memo),
+                          ),
+                        );
+                        if (newMemo != null) {
+                          setState(() {
+                            memo = newMemo; // 更新 memo 并刷新 UI
+                          });
+                        }
+                      },
+                    ),
+                  ),),
+                  Positioned(
+                    top: 130,right: 50,
                       child: SelectableText(
                         memo.created_at.substring(0,10),
                         style: MemoStyle.bodyHintTextStyle.copyWith(
@@ -113,13 +117,13 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                   ),
                   Positioned(
                     top: 80,
-                    left: 305,
+                    right: 50,
                     child: DeleteMemoWidget(memo: memo),
                   ),
                   Positioned(
                     top: 156, left: 51, right: 51,
                     child: SizedBox(
-                      height: 360, // 限制滚动区域
+                      height: screenHeight*0.3, // 限制滚动区域
                       child: SingleChildScrollView(
                         child: SelectableText(
                           memo.content,
@@ -130,7 +134,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                   ),
                   Container(
                     height: 100,
-                    margin: const EdgeInsets.only(top: 580, left: 31),
+                    margin: EdgeInsets.only(top: screenHeight*0.62, left: 31),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: ListView.builder(
@@ -139,7 +143,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                         itemCount: memo.images.length,
                         itemBuilder: (context, index) {
                           return InkWell(
-                            onTap: ()=> _viewImage(memo.images[index]),
+                            onTap: ()=> _viewImage(path.join(imgPath,'pictures',memo.images[index])),
                             child:Container(
                               width: 100,
                               margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -150,7 +154,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.file(
-                                  File(memo.images[index]), // 显示所有图片
+                                  File(path.join(imgPath,'pictures',memo.images[index])), // 显示所有图片
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -161,7 +165,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                     ),
                   ),
                   Container(
-                    margin: const EdgeInsets.only(top: 560),
+                    margin: EdgeInsets.only(top: screenHeight*0.6),
                     child: const Divider(
                       height: 1,
                       color: Color.fromRGBO(200, 200, 200, 1),
@@ -177,13 +181,12 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                   final confirm = await showSavePicDialog(context);
                   if(confirm ?? false) {
                     try {
-                      await CURDManager.savePicture(viewPic);
-
+                      final result = await CURDManager.savePicture(viewPic);
+                      print(result);
                     } catch(e) {
                       debugPrint('保存图片遇到错误: $e');
                     }
                   }
-
                 },
                 onTap: _closeImageViewer,
                 child: ImageViewerBuilder(

@@ -15,6 +15,7 @@ import 'profile.dart';
 import 'add_memo.dart';
 
 class MyHomePage extends StatefulWidget {
+
   const MyHomePage({super.key, required this.title});
 
   final String title;
@@ -22,11 +23,11 @@ class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
-
+//TODO 刷新，imgPath地址无法实时更新
 class _MyHomePageState extends State<MyHomePage> {
   final List<Memo> _memo = [];
   final Map<DateTime, int> _data = {};
-
+  String imgPath='';
   @override
   void initState() {
     _initExampleData();
@@ -39,7 +40,6 @@ class _MyHomePageState extends State<MyHomePage> {
     await _loadSavedMemos();
     setState(() {});
   }
-
   Future<void> _loadSavedMemos() async {
     final directory = await PathManager.getSavePath();
     final dir = Directory(directory);
@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
         .list()
         .where((file) => file.path.endsWith('.json') && file.path.contains('memo_'))
         .toList();
-
+    imgPath = await PathManager.getSavePath();
     for (var file in files) {
       final content = await File(file.path).readAsString();
       final json = jsonDecode(content);
@@ -74,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _navigateToCheckMemoPage(BuildContext context, Memo memo) async {
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MemoCheckPage(memo: memo)),
+      MaterialPageRoute(builder: (context) => MemoCheckPage(memo: memo,imgPath: imgPath,)),
     ).then((_) => {reloadMemo()});
   }
 
@@ -100,20 +100,25 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromRGBO(240, 251, 255, 1),
       body: Column(
         children: [
           Container(
-            width: 392,
+            margin: const EdgeInsets.only(top: 40,left:20),
+            //child: Text('Width:$screenWidth~memo:${_memo.length}'),
+            child: Text('Path:$imgPath~memo:${_memo.length}'),
+          ),
+          Container(
+            width: screenWidth - 30,
             height: 307,
             margin: const EdgeInsets.only(top: 50),
             decoration: MemoStyle.cardDecoration,
             child: Stack(
               children: [
                 Container(
-                  width: 253,
                   height: 73,
                   margin: const EdgeInsets.only(left: 12, top: 26, right: 121),
                   decoration: BoxDecoration(
@@ -144,9 +149,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              const Text(
-                                '已使用 Memo 280 天',
-                                style: TextStyle(
+                               Text(
+                                screenWidth>370?'已使用 Memo 280 天':'',
+                                style: const TextStyle(
                                   fontFamily: 'SourceHanSans',
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -160,8 +165,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(top: 65, left: 320),
+                Positioned(
+                  right: 25,
+                    child: Container(
+                  margin: const EdgeInsets.only(top: 65),
                   child: ValueListenableBuilder<bool>(
                     valueListenable: MemoConfig.showHeatMap,
                     builder: (context, showHeatMap, child) {
@@ -178,6 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       );
                     },
                   ),
+                )
                 ),
                 const SizedBox(height: 24),
                 Container(
@@ -200,7 +208,8 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           Expanded(
-            child: Align(
+            child:_memo.isNotEmpty
+                ? Align(
                 alignment: Alignment.topCenter,
                 child: ValueListenableBuilder(
                     valueListenable: MemoConfig.refresh,
@@ -211,10 +220,24 @@ class _MyHomePageState extends State<MyHomePage> {
                       }
                       return MemoListViewBuilder(
                         memos: _memo,
+                        imgPath: imgPath,
                         onPressed: (memo) =>
                             _navigateToCheckMemoPage(context, memo),
                       );
-                    })),
+                    }))
+                :Container(
+              width: screenWidth-30,
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  borderRadius: BorderRadius.circular(18)
+                ),
+                child: Container(
+                width: screenWidth*0.8,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(image: AssetImage('lib/assets/nomemo_placehoder.png'))
+              ),
+            ))
+            ,
           ),
         ],
       ),
