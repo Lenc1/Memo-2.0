@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:memo_program/pages/add_memo.dart';
 import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/widgets/image_view.dart';
+import 'package:path/path.dart' as path;
 import 'package:memo_program/widgets/memo_widget.dart';
 import 'package:memo_program/styles/memo_style.dart';
 import '../models/memo.dart';
 
 class MemoCheckPage extends StatefulWidget {
   final Memo memo;
-  const MemoCheckPage({super.key, required this.memo});
+  final String imgPath;
+  const MemoCheckPage({super.key, required this.memo,required this.imgPath});
 
   @override
   _MemoCheckPageState createState() => _MemoCheckPageState();
@@ -19,11 +21,13 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
   late Memo memo;
   bool _isCheck = false;
   String viewPic = '';
+  String imgPath ='';
   @override
   void initState() {
     super.initState();
     memo = widget.memo;
     viewPic = widget.memo.images.isNotEmpty ? widget.memo.images[0] : '';
+    imgPath = widget.imgPath;
   }
   void _viewImage(String path) {
     setState(() {
@@ -139,7 +143,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                         itemCount: memo.images.length,
                         itemBuilder: (context, index) {
                           return InkWell(
-                            onTap: ()=> _viewImage(memo.images[index]),
+                            onTap: ()=> _viewImage(path.join(imgPath,'pictures',memo.images[index])),
                             child:Container(
                               width: 100,
                               margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -150,7 +154,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.file(
-                                  File(memo.images[index]), // 显示所有图片
+                                  File(path.join(imgPath,'pictures',memo.images[index])), // 显示所有图片
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -177,8 +181,8 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                   final confirm = await showSavePicDialog(context);
                   if(confirm ?? false) {
                     try {
-                      await CURDManager.savePicture(viewPic);
-
+                      final result = await CURDManager.savePicture(viewPic);
+                      print(result);
                     } catch(e) {
                       debugPrint('保存图片遇到错误: $e');
                     }

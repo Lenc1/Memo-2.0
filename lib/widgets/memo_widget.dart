@@ -8,6 +8,7 @@ import '../models/heat_map.dart';
 import '../models/memo.dart';
 import '../services/memo_services.dart';
 import '../styles/memo_style.dart';
+import 'package:path/path.dart' as path;
 
 class NewMemoWidget extends StatelessWidget {
 
@@ -147,16 +148,17 @@ class NewMemoWidget extends StatelessWidget {
 class MemoListViewBuilder extends StatelessWidget {
   final List<Memo> memos;
   final void Function(Memo) onPressed;
-
+  final String imgPath;
   const MemoListViewBuilder({
     super.key,
     required this.memos,
     required this.onPressed,
+    required this.imgPath,
   });
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    print('~$imgPath');
     return ListView.builder(
       itemCount: memos.length,
       itemBuilder: (context, index) {
@@ -244,7 +246,6 @@ class MemoListViewBuilder extends StatelessWidget {
                             ),
                           ),
                         ),
-                        // 图片
                         Positioned(
                           right: 25,
                           child: Container(
@@ -268,7 +269,7 @@ class MemoListViewBuilder extends StatelessWidget {
                                 ),
                               )
                                   : Image.file(
-                                File(memo.images[0]),
+                                File(path.join(imgPath,'pictures',memo.images[0])),
                                 fit: BoxFit.cover,
                               ),
                             ),
