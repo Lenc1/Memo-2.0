@@ -8,12 +8,14 @@ import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if(Platform.isWindows){ //是否是桌面端
+  if (Platform.isWindows) {
+    //是否是桌面端
     await windowManager.ensureInitialized();
     windowManager.setSize(const Size(400, 800) //自定义窗口大小
         );
     //windowManager.setResizable(false); //是否可以缩放
   }
+
   await requestStoragePermission();
   runApp(const MyApp());
 }
@@ -38,6 +40,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 Future<void> requestStoragePermission() async {
   var status = await Permission.storage.status;
   if (status.isDenied) {

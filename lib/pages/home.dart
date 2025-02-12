@@ -15,7 +15,6 @@ import 'profile.dart';
 import 'add_memo.dart';
 
 class MyHomePage extends StatefulWidget {
-
   const MyHomePage({super.key, required this.title});
 
   final String title;
@@ -23,11 +22,12 @@ class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
+
 //TODO 刷新，imgPath地址无法实时更新
 class _MyHomePageState extends State<MyHomePage> {
   final List<Memo> _memo = [];
   final Map<DateTime, int> _data = {};
-  String imgPath='';
+  String imgPath = '';
   @override
   void initState() {
     _initExampleData();
@@ -40,12 +40,14 @@ class _MyHomePageState extends State<MyHomePage> {
     await _loadSavedMemos();
     setState(() {});
   }
+
   Future<void> _loadSavedMemos() async {
     final directory = await PathManager.getSavePath();
     final dir = Directory(directory);
     final files = await dir
         .list()
-        .where((file) => file.path.endsWith('.json') && file.path.contains('memo_'))
+        .where((file) =>
+            file.path.endsWith('.json') && file.path.contains('memo_'))
         .toList();
     imgPath = await PathManager.getSavePath();
     for (var file in files) {
@@ -74,15 +76,18 @@ class _MyHomePageState extends State<MyHomePage> {
   void _navigateToCheckMemoPage(BuildContext context, Memo memo) async {
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MemoCheckPage(memo: memo,imgPath: imgPath,)),
+      MaterialPageRoute(
+          builder: (context) => MemoCheckPage(
+                memo: memo,
+                imgPath: imgPath,
+              )),
     ).then((_) => {reloadMemo()});
   }
 
   void _navigateToNewDiaryPage(BuildContext context) async {
     final newDiary = await Navigator.push(
       context,
-      MaterialPageRoute(
-          builder: (context) => const NewDiaryPage(memo: null)),
+      MaterialPageRoute(builder: (context) => const NewDiaryPage(memo: null)),
     );
     if (newDiary != null) {
       setState(() {
@@ -92,10 +97,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _navigateToProfilePage(BuildContext context) async {
-    await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ProfilePage())
-    ).then((_) => {reloadMemo()});
+    await Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const ProfilePage()))
+        .then((_) => {reloadMemo()});
   }
 
   @override
@@ -106,11 +110,11 @@ class _MyHomePageState extends State<MyHomePage> {
       backgroundColor: const Color.fromRGBO(240, 251, 255, 1),
       body: Column(
         children: [
-          Container(
-            margin: const EdgeInsets.only(top: 40,left:20),
-            //child: Text('Width:$screenWidth~memo:${_memo.length}'),
-            child: Text('Path:$imgPath~memo:${_memo.length}'),
-          ),
+          // Container(
+          //   margin: const EdgeInsets.only(top: 40,left:20),
+          //   //child: Text('Width:$screenWidth~memo:${_memo.length}'),
+          //   child: Text('Path:$imgPath~memo:${_memo.length}'),
+          // ),
           Container(
             width: screenWidth - 30,
             height: 307,
@@ -149,8 +153,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                               Text(
-                                screenWidth>370?'已使用 Memo 280 天':'',
+                              Text(
+                                screenWidth > 370 ? '已使用 Memo 280 天' : '',
                                 style: const TextStyle(
                                   fontFamily: 'SourceHanSans',
                                   fontSize: 12,
@@ -166,27 +170,26 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 Positioned(
-                  right: 25,
+                    right: 25,
                     child: Container(
-                  margin: const EdgeInsets.only(top: 65),
-                  child: ValueListenableBuilder<bool>(
-                    valueListenable: MemoConfig.showHeatMap,
-                    builder: (context, showHeatMap, child) {
-                      return IconButton(
-                        onPressed: () {
-                          reloadMemo();
-                          MemoConfig.toggleHeatMap();
+                      margin: const EdgeInsets.only(top: 65),
+                      child: ValueListenableBuilder<bool>(
+                        valueListenable: MemoConfig.showHeatMap,
+                        builder: (context, showHeatMap, child) {
+                          return IconButton(
+                            onPressed: () {
+                              reloadMemo();
+                              MemoConfig.toggleHeatMap();
+                            },
+                            icon: Icon(
+                              showHeatMap
+                                  ? Icons.vertical_align_top
+                                  : Icons.vertical_align_bottom,
+                            ),
+                          );
                         },
-                        icon: Icon(
-                          showHeatMap
-                              ? Icons.vertical_align_top
-                              : Icons.vertical_align_bottom,
-                        ),
-                      );
-                    },
-                  ),
-                )
-                ),
+                      ),
+                    )),
                 const SizedBox(height: 24),
                 Container(
                   margin: const EdgeInsets.only(top: 127),
@@ -208,36 +211,35 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           Expanded(
-            child:_memo.isNotEmpty
+            child: _memo.isNotEmpty
                 ? Align(
-                alignment: Alignment.topCenter,
-                child: ValueListenableBuilder(
-                    valueListenable: MemoConfig.refresh,
-                    builder: (context, refresh, child) {
-                      if (refresh == false) {
-                        reloadMemo();
-                        MemoConfig.toggleRefresh();
-                      }
-                      return MemoListViewBuilder(
-                        memos: _memo,
-                        imgPath: imgPath,
-                        onPressed: (memo) =>
-                            _navigateToCheckMemoPage(context, memo),
-                      );
-                    }))
-                :Container(
-              width: screenWidth-30,
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(255, 255, 255, 1),
-                  borderRadius: BorderRadius.circular(18)
-                ),
-                child: Container(
-                width: screenWidth*0.8,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(image: AssetImage('lib/assets/nomemo_placehoder.png'))
-              ),
-            ))
-            ,
+                    alignment: Alignment.topCenter,
+                    child: ValueListenableBuilder(
+                        valueListenable: MemoConfig.refresh,
+                        builder: (context, refresh, child) {
+                          if (refresh == false) {
+                            reloadMemo();
+                            MemoConfig.toggleRefresh();
+                          }
+                          return MemoListViewBuilder(
+                            memos: _memo,
+                            imgPath: imgPath,
+                            onPressed: (memo) =>
+                                _navigateToCheckMemoPage(context, memo),
+                          );
+                        }))
+                : Container(
+                    width: screenWidth - 30,
+                    decoration: BoxDecoration(
+                        color: const Color.fromRGBO(255, 255, 255, 1),
+                        borderRadius: BorderRadius.circular(18)),
+                    child: Container(
+                      width: screenWidth * 0.8,
+                      decoration: const BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage(
+                                  'lib/assets/nomemo_placehoder.png'))),
+                    )),
           ),
         ],
       ),
