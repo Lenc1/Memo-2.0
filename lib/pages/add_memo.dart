@@ -139,7 +139,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
   }
 
   Widget _buildBackButton() {
-    return  InkWell(
+    return InkWell(
       child: IconButton(
         icon: const MemoBackButton(),
         onPressed: () => Navigator.pop(context),
@@ -153,6 +153,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       onPressed: () => setState(() => _isEditing = !_isEditing),
     );
   }
+
   Widget _buildSaveButton() {
     return SizedBox(
       width: 82,
@@ -166,23 +167,26 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color.fromRGBO(64, 185, 222, 1),
-          shape: RoundedRectangleBorder(borderRadius:  BorderRadius.circular(15)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         ),
         child: Text(
           '保存',
           maxLines: 1,
-          style: MemoStyle.bodyTextStyle.copyWith(fontSize: 14,color: Colors.white),
+          style: MemoStyle.bodyTextStyle
+              .copyWith(fontSize: 14, color: Colors.white),
         ),
       ),
     );
   }
+
   Widget _buildTitleSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
           TextField(
-            onChanged:(text){
+            onChanged: (text) {
               setState(() {});
             },
             controller: _titleController,
@@ -208,7 +212,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: _isEditing
             ? TextField(
-                onChanged: (text){
+                onChanged: (text) {
                   setState(() {});
                 },
                 controller: _controller,
@@ -221,11 +225,11 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
                 ),
               )
             : SingleChildScrollView(
-            child: Text(
-              _controller.text,
-              maxLines: 11,
-              style: MemoStyle.bodyTextStyle,
-            )),
+                child: Text(
+                _controller.text,
+                maxLines: 11,
+                style: MemoStyle.bodyTextStyle,
+              )),
       ),
     );
   }
@@ -250,6 +254,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       ),
     );
   }
+
   Widget _buildImageItem(int index) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
@@ -289,7 +294,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          if(!isWindows) _buildCameraButton(),
+          if (!isWindows) _buildCameraButton(),
           if (_images.length < 3) _buildGalleryButton(),
         ],
       ),

@@ -11,7 +11,6 @@ import '../styles/memo_style.dart';
 import 'package:path/path.dart' as path;
 
 class NewMemoWidget extends StatelessWidget {
-
   String _getCurrentDate() {
     DateTime now = DateTime.now();
     return "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
@@ -23,13 +22,11 @@ class NewMemoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     var screenWidth = MediaQuery.of(context).size.width;
     return Container(
-
       width: screenWidth,
       height: 156,
-      margin: const EdgeInsets.only(right: 11, left: 12),
+      margin: const EdgeInsets.only(top: 0, right: 11, left: 12),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [
@@ -123,7 +120,8 @@ class NewMemoWidget extends StatelessWidget {
                 height: 35,
                 margin: const EdgeInsets.only(top: 5),
                 decoration: const BoxDecoration(
-                  image: DecorationImage(image: AssetImage('lib/assets/tag.png')),
+                  image:
+                      DecorationImage(image: AssetImage('lib/assets/tag.png')),
                 ),
               ),
             ),
@@ -134,7 +132,8 @@ class NewMemoWidget extends StatelessWidget {
                 height: 70,
                 margin: const EdgeInsets.only(top: 73),
                 decoration: const BoxDecoration(
-                  image: DecorationImage(image: AssetImage('lib/assets/pen.png')),
+                  image:
+                      DecorationImage(image: AssetImage('lib/assets/pen.png')),
                 ),
               ),
             ),
@@ -158,13 +157,12 @@ class MemoListViewBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    print('~$imgPath');
     return ListView.builder(
       itemCount: memos.length,
       itemBuilder: (context, index) {
         final memo = memos[memos.length - index - 1];
         return Container(
-          padding: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.only(top: 0, bottom: 16),
           child: Slidable(
             endActionPane: ActionPane(
               motion: const DrawerMotion(),
@@ -182,7 +180,8 @@ class MemoListViewBuilder extends StatelessWidget {
                   //foregroundColor: Colors.white,
                   //icon: Icons.delete_rounded,
                   label: '删除',
-                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+                  borderRadius:
+                      const BorderRadius.horizontal(left: Radius.circular(16)),
                   autoClose: false,
                 ),
               ],
@@ -215,7 +214,8 @@ class MemoListViewBuilder extends StatelessWidget {
                         ),
                         // 分割线
                         Container(
-                          margin: const EdgeInsets.only(top: 58, left: 30, right: 154),
+                          margin: const EdgeInsets.only(
+                              top: 58, left: 30, right: 154),
                           child: const Divider(
                             height: 1,
                             color: Colors.grey,
@@ -260,18 +260,19 @@ class MemoListViewBuilder extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                               child: memo.images.isEmpty
                                   ? Container(
-                                decoration: const BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage(
-                                        'lib/assets/memo_placeholder.png'),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              )
+                                      decoration: const BoxDecoration(
+                                        image: DecorationImage(
+                                          image: AssetImage(
+                                              'lib/assets/memo_placeholder.png'),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    )
                                   : Image.file(
-                                File(path.join(imgPath,'pictures',memo.images[0])),
-                                fit: BoxFit.cover,
-                              ),
+                                      File(path.join(
+                                          imgPath, 'pictures', memo.images[0])),
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
                           ),
                         ),
@@ -290,24 +291,28 @@ class MemoListViewBuilder extends StatelessWidget {
 
 class DeleteMemoWidget extends StatelessWidget {
   final Memo memo;
-  const DeleteMemoWidget({super.key,required this.memo});
+  const DeleteMemoWidget({super.key, required this.memo});
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () async{
-        await CURDManager.handleDeleteMemo(context: context, memo: memo, onSuccess: (){
-          Navigator.pop(context);
-        });
+      onPressed: () async {
+        await CURDManager.handleDeleteMemo(
+            context: context,
+            memo: memo,
+            onSuccess: () {
+              Navigator.pop(context);
+            });
       },
       icon: const Icon(Icons.delete_outline),
     );
   }
 }
-Future<bool?> showSavePicDialog(BuildContext context) async{
+
+Future<bool?> showSavePicDialog(BuildContext context) async {
   return showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text('保存图片',style: MemoStyle.titleTextStyle),
+      title: Text('保存图片', style: MemoStyle.titleTextStyle),
       content: Text('是否要保存此图片？', style: MemoStyle.bodyTextStyle),
       actions: [
         TextButton(
@@ -328,21 +333,26 @@ Future<bool?> showSavePicDialog(BuildContext context) async{
       ),
       backgroundColor: Colors.white,
     ),
-
   );
 }
-Future<bool?> showCompressDialog(BuildContext context) async{
+
+Future<bool?> showCompressDialog(BuildContext context) async {
   return showDialog<bool>(
       context: context,
-      builder: (context) => const MemoBoolAskPop(title: '导出确认', content: '导出后是否保留现有memo', action1: '保留', action2: '清空')
-  );
+      builder: (context) => const MemoBoolAskPop(
+          title: '导出确认',
+          content: '导出后是否保留现有memo',
+          action1: '保留',
+          action2: '清空'));
 }
+
 Future<bool?> showDeleteDialog(BuildContext context) async {
   return showDialog<bool>(
-    context: context,
-    builder: (context) => const MemoBoolAskPop(title: '删除确认', content: '是否删除这条memo？', action1: '取消', action2: '删除')
-  );
+      context: context,
+      builder: (context) => const MemoBoolAskPop(
+          title: '删除确认', content: '是否删除这条memo？', action1: '取消', action2: '删除'));
 }
+
 final Map<DateTime, int> heatmapData = {
   DateTime.now().subtract(const Duration(days: 5)): 2,
   DateTime.now().subtract(const Duration(days: 8)): 4,
@@ -403,16 +413,22 @@ class MemoBackButton extends StatelessWidget {
     );
   }
 }
+
 class MemoBoolAskPop extends StatelessWidget {
   final String title;
   final String content;
   final String action1;
   final String action2;
-  const MemoBoolAskPop({super.key,required this.title,required this.content,required this.action1,required this.action2});
+  const MemoBoolAskPop(
+      {super.key,
+      required this.title,
+      required this.content,
+      required this.action1,
+      required this.action2});
 
   @override
   Widget build(BuildContext context) {
-    return  AlertDialog(
+    return AlertDialog(
       title: Text(
         title,
         style: MemoStyle.titleTextStyle.copyWith(
@@ -436,8 +452,11 @@ class MemoBoolAskPop extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          child: Text(action1,style: MemoStyle.dialogButtonTextStyle,),
-          onPressed: () => Navigator.pop(context,false),
+          child: Text(
+            action1,
+            style: MemoStyle.dialogButtonTextStyle,
+          ),
+          onPressed: () => Navigator.pop(context, false),
         ),
         TextButton(
           style: TextButton.styleFrom(
@@ -447,8 +466,11 @@ class MemoBoolAskPop extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          child: Text(action2,style: MemoStyle.dialogButtonTextStyle.copyWith(color:Colors.red),),
-          onPressed: () => Navigator.pop(context,true),
+          child: Text(
+            action2,
+            style: MemoStyle.dialogButtonTextStyle.copyWith(color: Colors.red),
+          ),
+          onPressed: () => Navigator.pop(context, true),
         ),
       ],
       shape: RoundedRectangleBorder(
@@ -458,15 +480,20 @@ class MemoBoolAskPop extends StatelessWidget {
     );
   }
 }
+
 class MemoReminderPop extends StatelessWidget {
   final String title;
   final String content;
   final String action;
-  const MemoReminderPop({super.key,required this.title,required this.content,required this.action});
+  const MemoReminderPop(
+      {super.key,
+      required this.title,
+      required this.content,
+      required this.action});
 
   @override
   Widget build(BuildContext context) {
-    return  AlertDialog(
+    return AlertDialog(
       title: Text(
         title,
         style: MemoStyle.titleTextStyle.copyWith(
@@ -490,7 +517,10 @@ class MemoReminderPop extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          child: Text(action,style: MemoStyle.dialogButtonTextStyle,),
+          child: Text(
+            action,
+            style: MemoStyle.dialogButtonTextStyle,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ],
