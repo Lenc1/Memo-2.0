@@ -97,7 +97,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                         top: 130,
                         right: 50,
                         child: SelectableText(
-                          memo.created_at.substring(0, 10),
+                          '${memo.created_at.substring(0, 10)}   ${memo.created_at.substring(11,19)}',
                           style: MemoStyle.bodyHintTextStyle.copyWith(
                             fontSize: 16,
                           ),

@@ -240,7 +240,7 @@ class MemoListViewBuilder extends StatelessWidget {
                         Container(
                           margin: const EdgeInsets.only(top: 105, left: 31),
                           child: Text(
-                            memo.created_at.substring(0, 10),
+                            '${memo.created_at.substring(0, 10)}   ${memo.created_at.substring(11,19)}' ,
                             style: MemoStyle.bodyHintTextStyle.copyWith(
                               fontSize: 13,
                             ),
