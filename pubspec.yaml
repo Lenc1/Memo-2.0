@@ -27,6 +27,7 @@ dependencies:
   flutter_svg_provider: ^1.0.0
   archive: ^4.0.2
   permission_handler: ^11.3.1
+  dio: ^5.8.0+1
 
 
 dev_dependencies:

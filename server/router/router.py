@@ -38,7 +38,7 @@ def register():
     data = request.json
     username = data.get('username')
     password = data.get('password')
-    nickname = '爱吃泡面用户001'
+    nickname = '默认用户名'
     email = data.get('email')
 
     if not username or not password:
@@ -241,14 +241,4 @@ def update_user_info(user_id):
     db.conn.commit()
 
     return jsonify({"success": True, "message": "用户信息更新成功"}), 200
-# 获取分数
-@bp.route('/api/get_score', methods=['GET'])
-@auth.token_required
-def get_score(user_id):
-    cursor.execute("SELECT point FROM point WHERE id = %s", (user_id,))
-    result = cursor.fetchone()
-    if result:
-        return jsonify({'score': result[0]})
-    else:
-        return jsonify({'score': 0})
 

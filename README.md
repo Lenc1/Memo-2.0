@@ -7,7 +7,7 @@
 
 Memo1.0：[Lenc1/Memo](https://github.com/Lenc1/Memo)
 
-![none](.image/about.png)
+![none](.image/Memo2.0.png)
 
 
 
