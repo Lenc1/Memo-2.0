@@ -26,6 +26,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
   bool _isEditing = true;
   String viewPic = '';
   bool isWindows = Platform.isWindows;
+  final UndoHistoryController _undoController = UndoHistoryController();
 
   @override
   void initState() {
@@ -35,6 +36,13 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       _controller.text = widget.memo!.content;
       _images = widget.memo!.images.map((path) => File(path)).toList();
     }
+  }
+
+  //历史记录销毁
+  @override
+  void dispose(){
+    _undoController.dispose();
+    super.dispose();
   }
 
   void _removeImage(int index) {
@@ -85,7 +93,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       backgroundColor: MemoStyle.memoBackGroundColor,
       body: _buildMainLayout(),
     );
@@ -125,14 +133,37 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildBackButton(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              _buildEditToggle(),
-              _buildSaveButton(),
-            ],
+          ValueListenableBuilder(
+            valueListenable: _undoController,
+            builder: (context, value, child) {
+              return IconButton(
+                icon: Icon(Icons.undo_rounded,
+                    color: value.canUndo ? Colors.blueGrey : Colors.grey[300],
+                    size: 20),
+                onPressed: value.canUndo ? () => _undoController.undo() : null,
+              );
+            },
           ),
+          ValueListenableBuilder(
+            valueListenable: _undoController,
+            builder: (context, value, child) {
+              return IconButton(
+                icon: Icon(Icons.redo_rounded,
+                    color: value.canRedo ? Colors.blueGrey : Colors.grey[300],
+                    size: 20),
+                onPressed: value.canRedo ? () => _undoController.redo() : null,
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+          _buildSaveButton(),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.end,
+          //   children: [
+          //     //_buildEditToggle(),
+          //     _buildSaveButton(),
+          //   ],
+          // ),
         ],
       ),
     );
@@ -205,31 +236,22 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       ),
     );
   }
-
   Widget _buildContentSection() {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: _isEditing
-            ? TextField(
-                onChanged: (text) {
-                  setState(() {});
-                },
-                controller: _controller,
-                maxLines: 11,
-                style: MemoStyle.bodyTextStyle,
-                decoration: InputDecoration(
-                  hintText: '在此输入文字...',
-                  hintStyle: MemoStyle.bodyHintTextStyle,
-                  border: InputBorder.none,
-                ),
-              )
-            : SingleChildScrollView(
-                child: Text(
-                _controller.text,
-                maxLines: 11,
-                style: MemoStyle.bodyTextStyle,
-              )),
+        child: TextField(
+          onChanged: (text) => setState(() {}),
+          controller: _controller,
+          undoController: _undoController, // 绑定在这里
+          maxLines: null, // 建议设为null，让日记可以无限向下写
+          style: MemoStyle.bodyTextStyle,
+          decoration: InputDecoration(
+            hintText: '在此输入文字...',
+            hintStyle: MemoStyle.bodyHintTextStyle,
+            border: InputBorder.none,
+          ),
+        ),
       ),
     );
   }
@@ -335,16 +357,20 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
 
   Widget _buildFloatingCounters() {
     return Positioned(
-      top: 140,
+      top: 150,
       right: 50,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text('${_titleController.text.length}/12',
               style: MemoStyle.bodyHintTextStyle),
-          const SizedBox(height: 370),
+          const SizedBox(height: 25),
           Text('字数:${_controller.text.length}',
-              style: MemoStyle.bodyHintTextStyle),
+              style:
+              MemoStyle.bodyHintTextStyle.copyWith(
+                fontSize: 12,
+              )
+          ),
         ],
       ),
     );

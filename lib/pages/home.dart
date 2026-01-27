@@ -26,11 +26,10 @@ class MyHomePage extends StatefulWidget {
 //TODO 刷新，imgPath地址无法实时更新
 class _MyHomePageState extends State<MyHomePage> {
   final List<Memo> _memo = [];
-  final Map<DateTime, int> _data = {};
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   String imgPath = '';
   @override
   void initState() {
-    _initExampleData();
     _loadSavedMemos();
     super.initState();
   }
@@ -44,33 +43,23 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _loadSavedMemos() async {
     final directory = await PathManager.getSavePath();
     final dir = Directory(directory);
-    final files = await dir
-        .list()
-        .where((file) =>
-            file.path.endsWith('.json') && file.path.contains('memo_'))
+    // 获取文件列表
+    final files = await dir.list()
+        .where((file) => file.path.endsWith('.json') && file.path.contains('memo_'))
         .toList();
-    imgPath = await PathManager.getSavePath();
+
+    List<Memo> fetchedMemos = [];
     for (var file in files) {
       final content = await File(file.path).readAsString();
-      final json = jsonDecode(content);
-      final memo = Memo.fromJson(json);
-      if (!_memo.any((m) => m.created_at == memo.created_at)) {
-        setState(() {
-          _memo.add(memo);
-        });
-      }
+      fetchedMemos.add(Memo.fromJson(jsonDecode(content)));
     }
-    _memo.sort((a, b) => a.created_at.compareTo(b.created_at));
-  }
 
-  void _initExampleData() {
-    var rng = Random();
-    var now = DateTime.now();
-    var today = DateTime(now.year, now.month, now.day);
-    for (int i = 0; i < 200; i++) {
-      DateTime date = today.subtract(Duration(days: i));
-      _data[date] = rng.nextInt(6); // Random number between 0 and 5
-    }
+    setState(() {
+      final newMemos = fetchedMemos.where((m) => !_memo.any((existing) => existing.created_at == m.created_at)).toList();
+      _memo.removeWhere((existing) => !fetchedMemos.any((m) => m.created_at == existing.created_at));
+      _memo.addAll(newMemos);
+      _memo.sort((a, b) => a.created_at.compareTo(b.created_at));
+    });
   }
 
   void _navigateToCheckMemoPage(BuildContext context, Memo memo) async {
@@ -106,113 +95,84 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color.fromRGBO(240, 251, 255, 1),
-      body: Column(
+      body: Stack(
         children: [
-          // Container(
-          //   margin: const EdgeInsets.only(top: 40,left:20),
-          //   //child: Text('Width:$screenWidth~memo:${_memo.length}'),
-          //   child: Text('Path:$imgPath~memo:${_memo.length}'),
-          // ),
-          Container(
-            width: screenWidth - 30,
-            height: 307,
-            margin: const EdgeInsets.only(top: 50),
-            decoration: MemoStyle.cardDecoration,
-            child: Stack(
-              children: [
-                Container(
-                  height: 73,
-                  margin: const EdgeInsets.only(left: 12, top: 26, right: 121),
-                  decoration: BoxDecoration(
-                    color: const Color.fromRGBO(242, 242, 242, 1),
-                    borderRadius: BorderRadius.circular(37),
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      _navigateToProfilePage(context);
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(
-                              top: 6, left: 8, right: 14, bottom: 7),
-                          child: const UserAvatar(),
-                        ),
-                        Container(
-                          alignment: Alignment.topLeft,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 10),
-                              UserName(
-                                style: MemoStyle.titleTextStyle.copyWith(
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                screenWidth > 370 ? '已使用 Memo 280 天' : '',
-                                style: const TextStyle(
-                                  fontFamily: 'SourceHanSans',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color.fromRGBO(117, 117, 117, 1),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                    right: 25,
-                    child: Container(
-                      margin: const EdgeInsets.only(top: 65),
-                      child: ValueListenableBuilder<bool>(
-                        valueListenable: MemoConfig.showHeatMap,
-                        builder: (context, showHeatMap, child) {
-                          return IconButton(
-                            onPressed: () {
-                              reloadMemo();
-                              MemoConfig.toggleHeatMap();
-                            },
-                            icon: Icon(
-                              showHeatMap
-                                  ? Icons.vertical_align_top
-                                  : Icons.vertical_align_bottom,
-                            ),
-                          );
-                        },
+          Column(
+            children: [
+              // Container(
+              //   margin: const EdgeInsets.only(top: 30,left:20),
+              //   child: Text('Width:$screenWidth~memo:${_memo.length}'),
+              //   //child: Text('Path:$imgPath~memo:${_memo.length}'),
+              // ),
+              Container(
+                width: screenWidth - 30,
+                height: 307,
+                margin: const EdgeInsets.only(top: 50),
+                decoration: MemoStyle.cardDecoration,
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 73,
+                      margin: const EdgeInsets.only(left: 12, top: 26, right: 121),
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(242, 242, 242, 1),
+                        borderRadius: BorderRadius.circular(37),
                       ),
-                    )),
-                const SizedBox(height: 24),
-                Container(
-                  margin: const EdgeInsets.only(top: 127),
-                  child: NewMemoWidget(
-                      onPressed: () => _navigateToNewDiaryPage(context)),
-                )
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          ValueListenableBuilder(
-            valueListenable: MemoConfig.showHeatMap,
-            builder: (context, showHeatMap, child) {
-              if (showHeatMap) {
-                return const MyHeatMap();
-              } else {
-                return Container();
-              }
-            },
-          ),
-          Expanded(
-            child: _memo.isNotEmpty
-                ? Align(
+                      child: InkWell(
+                        onTap: () {
+                          _navigateToProfilePage(context);
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  top: 6, left: 8, right: 14, bottom: 7),
+                              child: const UserAvatar(),
+                            ),
+                            Container(
+                              alignment: Alignment.topLeft,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 10),
+                                  UserName(
+                                    style: MemoStyle.titleTextStyle.copyWith(
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    screenWidth > 370 ? '已使用 Memo 280 天' : '',
+                                    style: const TextStyle(
+                                      fontFamily: 'SourceHanSans',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color.fromRGBO(117, 117, 117, 1),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Container(
+                      margin: const EdgeInsets.only(top: 127),
+                      child: NewMemoWidget(
+                          onPressed: () => _navigateToNewDiaryPage(context)),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: _memo.isNotEmpty
+                    ? Align(
                     alignment: Alignment.topCenter,
                     child: ValueListenableBuilder(
                         valueListenable: MemoConfig.refresh,
@@ -228,7 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 _navigateToCheckMemoPage(context, memo),
                           );
                         }))
-                : Container(
+                    : Container(
                     width: screenWidth - 30,
                     decoration: BoxDecoration(
                         color: const Color.fromRGBO(255, 255, 255, 1),
@@ -240,8 +200,42 @@ class _MyHomePageState extends State<MyHomePage> {
                               image: AssetImage(
                                   'lib/assets/nomemo_placehoder.png'))),
                     )),
+              ),
+            ],
           ),
-        ],
+          Positioned(
+            bottom: 30,
+            left: 30,
+            right: 30,
+            child: Container(
+              height: 55,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  )
+                ],
+              ),
+              child: TextField(
+                textAlignVertical: TextAlignVertical.center,
+                decoration: InputDecoration(
+                  hintText: '搜索标题或内容...',
+                  hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
+                  prefixIcon: const Icon(Icons.search_rounded, color: Colors.blueGrey),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                ),
+                onChanged: (query) {
+                  // 搜索逻辑
+                  },
+                ),
+              ),
+            ),
+          ],
       ),
     );
   }

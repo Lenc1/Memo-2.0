@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:memo_program/config/config_list.dart';
+import 'package:memo_program/pages/config.dart';
 import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/styles/memo_style.dart';
 import 'package:memo_program/widgets/user_widget.dart';
@@ -151,6 +152,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                         return MemoReminderPop(title: '提醒', content: result, action: '确认',
                                         );
                                       });
+                                  break;
+                                case '5':
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const ConfigPage()),
+                                  );
                                   break;
                                 default:
                                   print("无效的路径");
