@@ -18,7 +18,6 @@ dependencies:
   flutter_markdown: ^0.7.6+1
   simple_heatmap_calendar: ^0.4.0
   table_calendar: ^3.0.9
-#  heatmap_calendar: ^1.0.1
   window_manager: ^0.3.7
   file_picker: ^8.3.2
   path_provider: ^2.0.11
@@ -28,6 +27,8 @@ dependencies:
   archive: ^4.0.2
   permission_handler: ^11.3.1
   dio: ^5.8.0+1
+  flutter_svg: ^2.1.0
+  image_gallery_saver_plus: ^3.0.5
 
 
 dev_dependencies:
@@ -43,7 +44,7 @@ flutter:
     - lib/assets/addition_fill.png
     - lib/assets/tag.png
     - lib/assets/pen.png
-    - lib/assets/back.svg
+    - lib/assets/back.png
     - lib/assets/photos.svg
     - lib/assets/backFile.png
     - lib/assets/equipment.svg
@@ -53,6 +54,7 @@ flutter:
     - lib/assets/memo_placeholder.png
     - lib/assets/camera.svg
     - lib/assets/nomemo_placehoder.png
+    - lib/assets/set.svg
   fonts:
     - family: SourceHanSans
       fonts:

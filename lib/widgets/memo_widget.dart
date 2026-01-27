@@ -1,15 +1,75 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import '../config/memo_config.dart';
-import '../models/heat_map.dart';
 import '../models/memo.dart';
 import '../services/memo_services.dart';
 import '../styles/memo_style.dart';
 import 'package:path/path.dart' as path;
 
+class SmartHeatMap extends StatelessWidget {
+  const SmartHeatMap({super.key});
+
+  Future<Map<DateTime, int>> _fetchHeatmapData() async {
+    final Map<DateTime, int> dataset = {};
+    final directory = await PathManager.getSavePath();
+    final dir = Directory(directory);
+
+    final files = await dir.list().where((f) => f.path.endsWith('.json')).toList();
+
+    for (var file in files) {
+      try {
+        final content = await File(file.path).readAsString();
+        final memo = Memo.fromJson(jsonDecode(content));
+        DateTime date = DateTime.fromMillisecondsSinceEpoch(int.parse(memo.milliseconds));
+        DateTime dayKey = DateTime(date.year, date.month, date.day);
+        dataset[dayKey] = (dataset[dayKey] ?? 0) + 1;
+      } catch (e) {
+        continue;
+      }
+    }
+    return dataset;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<DateTime, int>>(
+      future: _fetchHeatmapData(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const SizedBox();
+        return Container(
+          margin: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6)],
+          ),
+          child: HeatMap(
+            datasets: snapshot.data,
+            colorMode: ColorMode.opacity,
+            showColorTip: false,
+            scrollable: true,
+            borderRadius: 3,
+            size: 9,
+            margin: const EdgeInsets.all(1.8),
+            fontSize: 8,
+            colorsets: {
+              1: const Color(0xFF8BE1E4),
+              3: const Color(0xFF6FBEC9),
+              5: const Color(0xFF23579A),
+            },
+            startDate: DateTime.now().subtract(const Duration(days:77)),
+            endDate: DateTime.now(),
+          ),
+        );
+      },
+    );
+  }
+}
 class NewMemoWidget extends StatelessWidget {
   String _getCurrentDate() {
     DateTime now = DateTime.now();
@@ -83,36 +143,40 @@ class NewMemoWidget extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
+            const Positioned(
               right: 0,
-              child: Container(
-                width: 196,
-                height: 130,
-                margin: const EdgeInsets.only(top: 13, right: 12, bottom: 13),
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(255, 255, 255, 1),
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color.fromRGBO(0, 0, 0, 0.25),
-                      offset: Offset(0, 2),
-                      blurRadius: 4,
-                      spreadRadius: 0,
-                    ),
-                  ],
-                ),
-                child: Container(
-                  margin: const EdgeInsets.only(top: 24, left: 22, bottom: 68),
-                  child: Text(
-                    _getCurrentDate(),
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-              ),
+                child: SmartHeatMap(),
             ),
+            // Positioned(
+            //   right: 0,
+            //   child: Container(
+            //     width: 196,
+            //     height: 130,
+            //     margin: const EdgeInsets.only(top: 13, right: 12, bottom: 13),
+            //     decoration: BoxDecoration(
+            //       color: const Color.fromRGBO(255, 255, 255, 1),
+            //       borderRadius: BorderRadius.circular(18),
+            //       boxShadow: const [
+            //         BoxShadow(
+            //           color: Color.fromRGBO(0, 0, 0, 0.25),
+            //           offset: Offset(0, 2),
+            //           blurRadius: 4,
+            //           spreadRadius: 0,
+            //         ),
+            //       ],
+            //     ),
+            //     child: Container(
+            //       margin: const EdgeInsets.only(top: 24, left: 22, bottom: 68),
+            //       child: Text(
+            //         _getCurrentDate(),
+            //         style: const TextStyle(
+            //           fontSize: 22,
+            //           fontWeight: FontWeight.w900,
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
             Positioned(
               right: 20,
               child: Container(
@@ -125,18 +189,18 @@ class NewMemoWidget extends StatelessWidget {
                 ),
               ),
             ),
-            Positioned(
-              right: 30,
-              child: Container(
-                width: 60,
-                height: 70,
-                margin: const EdgeInsets.only(top: 73),
-                decoration: const BoxDecoration(
-                  image:
-                      DecorationImage(image: AssetImage('lib/assets/pen.png')),
-                ),
-              ),
-            ),
+            // Positioned(
+            //   right: 30,
+            //   child: Container(
+            //     width: 60,
+            //     height: 70,
+            //     margin: const EdgeInsets.only(top: 73),
+            //     decoration: const BoxDecoration(
+            //       image:
+            //           DecorationImage(image: AssetImage('lib/assets/pen.png')),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -158,6 +222,7 @@ class MemoListViewBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     return ListView.builder(
+      padding: EdgeInsets.zero, //默认会留出刘海空间，所以强制设置0
       itemCount: memos.length,
       itemBuilder: (context, index) {
         final memo = memos[memos.length - index - 1];
@@ -179,7 +244,7 @@ class MemoListViewBuilder extends StatelessWidget {
                   backgroundColor: const Color.fromRGBO(255, 73, 73, 1),
                   //foregroundColor: Colors.white,
                   //icon: Icons.delete_rounded,
-                  label: '删除',
+                  label: '删除', //TODO: 改成变量，方便全局语言修改
                   borderRadius:
                       const BorderRadius.horizontal(left: Radius.circular(16)),
                   autoClose: false,
@@ -353,62 +418,20 @@ Future<bool?> showDeleteDialog(BuildContext context) async {
           title: '删除确认', content: '是否删除这条memo？', action1: '取消', action2: '删除'));
 }
 
-final Map<DateTime, int> heatmapData = {
-  DateTime.now().subtract(const Duration(days: 5)): 2,
-  DateTime.now().subtract(const Duration(days: 8)): 4,
-  DateTime.now().subtract(const Duration(days: 15)): 1,
-};
-
-class MyHeatMap extends StatelessWidget {
-  // TODO: 热力图
-  const MyHeatMap();
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 392,
-      height: 130,
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            GitHubHeatmap(
-              startDate: DateTime.now().subtract(const Duration(days: 29 * 7)),
-              totalWeeks: 30,
-              data: heatmapData,
-              cellSize: 9,
-              spacing: 1,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class MemoBackButton extends StatelessWidget {
   const MemoBackButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 22,
-      height: 20,
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: Svg('lib/assets/back.svg'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: InkWell(
-        onTap: () {
-          print("back");
-          Navigator.pop(context);
-        },
+    return GestureDetector(
+      onTap: () => Navigator.pop(context),
+      behavior: HitTestBehavior.opaque,
+      child: Image.asset(
+        'lib/assets/back.png',
+        width: 22,
+        height: 20,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
       ),
     );
   }

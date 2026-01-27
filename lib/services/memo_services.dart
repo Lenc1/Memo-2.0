@@ -6,29 +6,33 @@ import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'dart:io';
+import '../config/memo_config.dart';
 import '../models/memo.dart';
 import '../widgets/memo_widget.dart';
 
 class CURDManager {
-  static Future<String> savePicture(String originPath,) async {
-    final targetPath = await FilePicker.platform.getDirectoryPath();
-    final now = DateTime.now();
-    final picSec = now.millisecondsSinceEpoch.toString();
-    if (targetPath != null) {
-      String optPath = path.join(targetPath,
-          'memoPic_$picSec.${originPath.split('.').last}');
-      try {
-        print(originPath);
-        print(targetPath);
-        print(optPath);
-        await File(originPath).copy(optPath);
-        return "图片保存成功";
-      } catch (e) {
-        return"保存失败,路径错误";
+  static Future<String> savePicture(String originPath) async {
+    try {
+      final file = File(originPath);
+      if (!await file.exists()) return "保存失败：原始文件不存在";
+      final bytes = await file.readAsBytes();
+      final result = await ImageGallerySaverPlus.saveImage(
+        bytes,
+        quality: 100,
+        name: "memoPic_${DateTime.now().millisecondsSinceEpoch}",
+      );
+
+      if (result != null && result['isSuccess'] == true) {
+
+        return "图片已保存至相册";
+      } else {
+        return "保存失败: ${result['errorMessage'] ?? '未知错误'}";
       }
+    } catch (e) {
+      return "保存失败: 权限不足或系统错误";
     }
-    return '保存失败,路径错误';
   }
 
   static Future<String?> movePicture(String originPath) async {
@@ -74,10 +78,14 @@ class CURDManager {
     }
 
     // 检查内容是否为空
-    if (controller.text.isNotEmpty) {
+    if (titleController.text.trim().isNotEmpty && controller.text.trim().isNotEmpty) {
       final now = DateTime.now();
       List<String> imageFileNames = []; // 只存储图片文件名
+      final String finalMilliseconds = memo?.milliseconds ?? now.millisecondsSinceEpoch.toString();
 
+      final String finalCreatedAt = (memo != null && !MemoConfig.updateTimeOnEdit.value)
+          ? memo.created_at
+          : now.toIso8601String();
       // 处理图片：只存储文件名
       for (var image in images) {
         if (image.path.contains('memoPic_')) {
@@ -96,18 +104,15 @@ class CURDManager {
       final newMemo = Memo(
         title: titleController.text,
         content: controller.text,
-        images: imageFileNames, // 只存储文件名
-        created_at: memo?.created_at ?? now.toIso8601String(),
-        milliseconds: memo?.milliseconds ?? now.millisecondsSinceEpoch.toString(),
+        images: imageFileNames,
+        created_at: finalCreatedAt,
+        milliseconds: finalMilliseconds,
       );
 
       // 获取保存路径
       final directory = await PathManager.getSavePath();
       final file = File('$directory/memo_${newMemo.milliseconds}.json');
-
-      // 将 Memo 对象转换为 JSON 并保存
-      final memoJson = jsonEncode(newMemo.toJson());
-      await file.writeAsString(memoJson);
+      await file.writeAsString(jsonEncode(newMemo.toJson()));
 
       // 返回新的 Memo 并关闭当前页面
       Navigator.pop(context, newMemo);
@@ -118,7 +123,7 @@ class CURDManager {
         builder: (BuildContext context) {
           return const MemoReminderPop(
             title: '提示',
-            content: '请填写内容并选择至少1张图片',
+            content: '标题和内容不能为空',
             action: '确定',
           );
         },

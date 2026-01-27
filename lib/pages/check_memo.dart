@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:memo_program/pages/add_memo.dart';
 import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/widgets/image_view.dart';
-import 'package:path/path.dart' as path;
+import 'package:path/path.dart' as path show join;
 import 'package:memo_program/widgets/memo_widget.dart';
 import 'package:memo_program/styles/memo_style.dart';
 import '../models/memo.dart';
@@ -48,7 +48,7 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
     var screenWidth = MediaQuery.of(context).size.width;
     var screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      resizeToAvoidBottomInset: false, //关键一行，优化溢出
+      resizeToAvoidBottomInset: false,
       backgroundColor: MemoStyle.memoBackGroundColor,
       body: Align(
           alignment: Alignment.topCenter,
@@ -202,7 +202,14 @@ class _MemoCheckPageState extends State<MemoCheckPage> {
                       if (confirm ?? false) {
                         try {
                           final result = await CURDManager.savePicture(viewPic);
-                          print(result);
+                          if(context.mounted) {
+                            showDialog(context: context,
+                                builder: (context) =>MemoReminderPop(
+                                    title: '保存成功',
+                                    content: result,
+                                    action: '确定')
+                            );
+                          }
                         } catch (e) {
                           debugPrint('保存图片遇到错误: $e');
                         }

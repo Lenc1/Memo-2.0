@@ -9,5 +9,6 @@ class ConfigList {
     ConfigList('2',"移动Memo","lib/assets/floder_icon.svg"),
     ConfigList('3',"导出Memo","lib/assets/file_upload_icon.svg"),
     ConfigList('4',"导入Memo","lib/assets/file_download_icon.svg"),
+    ConfigList('5',"设置","lib/assets/set.svg"),
   ];
 }
