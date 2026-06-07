@@ -9,6 +9,7 @@ import 'package:memo_program/services/memo_services.dart';
 
 //import 'package:path_provider/path_provider.dart';
 import '../config/memo_config.dart';
+import 'todo_page.dart';
 import '../widgets/memo_widget.dart';
 import 'check_memo.dart';
 import 'config.dart';
@@ -113,6 +114,12 @@ class _MyHomePageState extends State<MyHomePage> {
             MaterialPageRoute(builder: (context) => const ProfilePage()))
         .then((_) => {reloadMemo()});
   }
+  void _navigateToTodoPage(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TodoPage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +195,30 @@ class _MyHomePageState extends State<MyHomePage> {
                   margin: const EdgeInsets.only(top: 127),
                   child: NewMemoWidget(
                       onPressed: () => _navigateToNewDiaryPage(context)),
-                )
+                ),
+                // TODO 按钮 - 右上角
+                Positioned(
+                  right: 24,
+                  top: 40,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () => _navigateToTodoPage(context),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [MemoStyle.cardShadow],
+                      ),
+                      child: const Icon(
+                        Icons.checklist_rounded,
+                        color: Color.fromRGBO(64, 185, 222, 1),
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
               ],
               ),
             ),

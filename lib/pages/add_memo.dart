@@ -1,9 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memo_program/services/memo_services.dart';
 import 'package:memo_program/widgets/memo_widget.dart';
-import 'dart:io';
 import 'package:memo_program/styles/memo_style.dart';
 import '../models/memo.dart';
 import '../widgets/image_view.dart';
@@ -40,7 +40,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
 
   //历史记录销毁
   @override
-  void dispose(){
+  void dispose() {
     _undoController.dispose();
     super.dispose();
   }
@@ -107,21 +107,39 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             decoration: MemoStyle.cardDecoration,
-            child: Column(
+            child: Stack(
               children: [
-                _buildHeaderSection(),
-                _buildTitleSection(),
-                _buildContentSection(),
-                _buildImageSection(),
-                _buildBottomActions(),
+                Column(
+                  children: [
+                    _buildHeaderSection(),
+                    _buildTitleSection(),
+                    _buildContentSection(),
+                    _buildImageSection(),
+                    _buildBottomActions(),
+                  ],
+                ),
+                Positioned(
+                  top: 150,
+                  right: 30,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('${_titleController.text.length}/12',
+                          style: MemoStyle.bodyHintTextStyle),
+                      const SizedBox(height: 25),
+                      Text('字数:${_controller.text.length}',
+                          style: MemoStyle.bodyHintTextStyle.copyWith(
+                            fontSize: 12,
+                          )),
+                    ],
+                  ),
+                ),
+                // 图片查看器
+                if (_isCheck) _buildImageViewer(),
               ],
             ),
           ),
         ),
-        // 悬浮统计信息
-        _buildFloatingCounters(),
-        // 图片查看器
-        if (_isCheck) _buildImageViewer(),
       ],
     );
   }
@@ -129,40 +147,70 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
   Widget _buildHeaderSection() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          ValueListenableBuilder(
-            valueListenable: _undoController,
-            builder: (context, value, child) {
-              return IconButton(
-                icon: Icon(Icons.undo_rounded,
-                    color: value.canUndo ? Colors.blueGrey : Colors.grey[300],
-                    size: 20),
-                onPressed: value.canUndo ? () => _undoController.undo() : null,
-              );
-            },
+          // 顶部返回按钮 + Memo 标题（与其他页面保持统一）
+          Stack(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(left: 0, top: 10),
+                child: const MemoBackButton(),
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                alignment: Alignment.center,
+                child: const Text(
+                  'Memo',
+                  style: TextStyle(
+                    fontFamily: 'SourceHanSans',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Color.fromRGBO(46, 46, 46, 1),
+                  ),
+                ),
+              ),
+            ],
           ),
-          ValueListenableBuilder(
-            valueListenable: _undoController,
-            builder: (context, value, child) {
-              return IconButton(
-                icon: Icon(Icons.redo_rounded,
-                    color: value.canRedo ? Colors.blueGrey : Colors.grey[300],
-                    size: 20),
-                onPressed: value.canRedo ? () => _undoController.redo() : null,
-              );
-            },
+          const SizedBox(height: 12),
+          // 撤销/重做 + 保存按钮 同一行
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  ValueListenableBuilder(
+                    valueListenable: _undoController,
+                    builder: (context, value, child) {
+                      return IconButton(
+                        icon: Icon(Icons.undo_rounded,
+                            color: value.canUndo
+                                ? Colors.blueGrey
+                                : Colors.grey[300],
+                            size: 20),
+                        onPressed:
+                            value.canUndo ? () => _undoController.undo() : null,
+                      );
+                    },
+                  ),
+                  ValueListenableBuilder(
+                    valueListenable: _undoController,
+                    builder: (context, value, child) {
+                      return IconButton(
+                        icon: Icon(Icons.redo_rounded,
+                            color: value.canRedo
+                                ? Colors.blueGrey
+                                : Colors.grey[300],
+                            size: 20),
+                        onPressed:
+                            value.canRedo ? () => _undoController.redo() : null,
+                      );
+                    },
+                  ),
+                ],
+              ),
+              _buildSaveButton(),
+            ],
           ),
-          const SizedBox(width: 8),
-          _buildSaveButton(),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.end,
-          //   children: [
-          //     //_buildEditToggle(),
-          //     _buildSaveButton(),
-          //   ],
-          // ),
         ],
       ),
     );
@@ -236,6 +284,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
       ),
     );
   }
+
   Widget _buildContentSection() {
     return Expanded(
       child: Padding(
@@ -351,27 +400,6 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
           ImageIcon(Svg(icon), size: 24, color: Colors.grey[600]),
           const SizedBox(width: 8),
           Text(label, style: MemoStyle.bodyHintTextStyle),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFloatingCounters() {
-    return Positioned(
-      top: 150,
-      right: 50,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text('${_titleController.text.length}/12',
-              style: MemoStyle.bodyHintTextStyle),
-          const SizedBox(height: 25),
-          Text('字数:${_controller.text.length}',
-              style:
-              MemoStyle.bodyHintTextStyle.copyWith(
-                fontSize: 12,
-              )
-          ),
         ],
       ),
     );

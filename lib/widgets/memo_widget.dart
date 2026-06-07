@@ -19,13 +19,15 @@ class SmartHeatMap extends StatelessWidget {
     final directory = await PathManager.getSavePath();
     final dir = Directory(directory);
 
-    final files = await dir.list().where((f) => f.path.endsWith('.json')).toList();
+    final files =
+        await dir.list().where((f) => f.path.endsWith('.json')).toList();
 
     for (var file in files) {
       try {
         final content = await File(file.path).readAsString();
         final memo = Memo.fromJson(jsonDecode(content));
-        DateTime date = DateTime.fromMillisecondsSinceEpoch(int.parse(memo.milliseconds));
+        DateTime date =
+            DateTime.fromMillisecondsSinceEpoch(int.parse(memo.milliseconds));
         DateTime dayKey = DateTime(date.year, date.month, date.day);
         dataset[dayKey] = (dataset[dayKey] ?? 0) + 1;
       } catch (e) {
@@ -47,7 +49,9 @@ class SmartHeatMap extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
-            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6)],
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6)
+            ],
           ),
           child: HeatMap(
             datasets: snapshot.data,
@@ -63,7 +67,7 @@ class SmartHeatMap extends StatelessWidget {
               3: const Color(0xFF6FBEC9),
               5: const Color(0xFF23579A),
             },
-            startDate: DateTime.now().subtract(const Duration(days:77)),
+            startDate: DateTime.now().subtract(const Duration(days: 77)),
             endDate: DateTime.now(),
           ),
         );
@@ -71,6 +75,7 @@ class SmartHeatMap extends StatelessWidget {
     );
   }
 }
+
 class NewMemoWidget extends StatelessWidget {
   String _getCurrentDate() {
     DateTime now = DateTime.now();
@@ -146,43 +151,13 @@ class NewMemoWidget extends StatelessWidget {
             ),
             const Positioned(
               right: 0,
-                child: SmartHeatMap(),
+              child: SmartHeatMap(),
             ),
-            // Positioned(
-            //   right: 0,
-            //   child: Container(
-            //     width: 196,
-            //     height: 130,
-            //     margin: const EdgeInsets.only(top: 13, right: 12, bottom: 13),
-            //     decoration: BoxDecoration(
-            //       color: const Color.fromRGBO(255, 255, 255, 1),
-            //       borderRadius: BorderRadius.circular(18),
-            //       boxShadow: const [
-            //         BoxShadow(
-            //           color: Color.fromRGBO(0, 0, 0, 0.25),
-            //           offset: Offset(0, 2),
-            //           blurRadius: 4,
-            //           spreadRadius: 0,
-            //         ),
-            //       ],
-            //     ),
-            //     child: Container(
-            //       margin: const EdgeInsets.only(top: 24, left: 22, bottom: 68),
-            //       child: Text(
-            //         _getCurrentDate(),
-            //         style: const TextStyle(
-            //           fontSize: 22,
-            //           fontWeight: FontWeight.w900,
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // ),
             Positioned(
-              right: 20,
+              right: 15,
               child: Container(
                 width: 35,
-                height: 35,
+                height: 30,
                 margin: const EdgeInsets.only(top: 5),
                 decoration: const BoxDecoration(
                   image:
@@ -190,18 +165,6 @@ class NewMemoWidget extends StatelessWidget {
                 ),
               ),
             ),
-            // Positioned(
-            //   right: 30,
-            //   child: Container(
-            //     width: 60,
-            //     height: 70,
-            //     margin: const EdgeInsets.only(top: 73),
-            //     decoration: const BoxDecoration(
-            //       image:
-            //           DecorationImage(image: AssetImage('lib/assets/pen.png')),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -232,27 +195,29 @@ class MemoListViewBuilder extends StatelessWidget {
           child: Slidable(
             startActionPane: ActionPane(
               motion: const ScrollMotion(),
-              extentRatio: 0.2,
+              extentRatio: 0.01,
               children: [
                 SlidableAction(
                   onPressed: (context) {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        pageBuilder: (context, anim, secondAnim) => const ConfigPage(),
+                        pageBuilder: (context, anim, secondAnim) =>
+                            const ConfigPage(),
                         transitionsBuilder: (context, anim, secondAnim, child) {
                           return SlideTransition(
-                            position: anim.drive(Tween(begin: const Offset(-1, 0), end: Offset.zero).chain(CurveTween(curve: Curves.easeOutCubic))),
+                            position: anim.drive(Tween(
+                                    begin: const Offset(-1, 0),
+                                    end: Offset.zero)
+                                .chain(CurveTween(curve: Curves.easeOutCubic))),
                             child: child,
                           );
                         },
                       ),
                     );
                   },
-                  backgroundColor: Colors.transparent, // 透明背景，丝滑跳转
-                  label: '设置',
-                  icon: Icons.settings_rounded,
-                  foregroundColor: Colors.blue,
+                  backgroundColor: Colors.transparent,
+                  label: '',
                 ),
               ],
             ),
@@ -332,7 +297,7 @@ class MemoListViewBuilder extends StatelessWidget {
                         Container(
                           margin: const EdgeInsets.only(top: 105, left: 31),
                           child: Text(
-                            '${memo.created_at.substring(0, 10)}   ${memo.created_at.substring(11,19)}' ,
+                            '${memo.created_at.substring(0, 10)}   ${memo.created_at.substring(11, 19)}',
                             style: MemoStyle.bodyHintTextStyle.copyWith(
                               fontSize: 13,
                             ),
