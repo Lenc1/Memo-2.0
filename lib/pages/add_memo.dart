@@ -102,7 +102,6 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
   Widget _buildMainLayout() {
     return Stack(
       children: [
-        // 主内容卡片
         Positioned.fill(
           top: 50,
           child: Container(
@@ -221,6 +220,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
               setState(() {});
             },
             controller: _titleController,
+            cursorColor: Colors.blueGrey,
             style: MemoStyle.titleTextStyle,
             maxLines: 1,
             maxLength: 12,
@@ -243,6 +243,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
         child: TextField(
           onChanged: (text) => setState(() {}),
           controller: _controller,
+          cursorColor: Colors.blueGrey,
           undoController: _undoController, // 绑定在这里
           maxLines: null, // 建议设为null，让日记可以无限向下写
           style: MemoStyle.bodyTextStyle,
@@ -334,7 +335,7 @@ class _NewDiaryPageState extends State<NewDiaryPage> {
   Widget _buildGalleryButton() {
     return _buildIconButton(
       icon: 'lib/assets/photos.svg',
-      label: _images.isEmpty ? '上传照片' : '继续上传',
+      label: '相册上传',
       onTap: _pickImages,
     );
   }

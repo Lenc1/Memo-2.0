@@ -6,6 +6,7 @@ import 'package:flutter_heatmap_calendar/flutter_heatmap_calendar.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../config/memo_config.dart';
 import '../models/memo.dart';
+import '../pages/config.dart';
 import '../services/memo_services.dart';
 import '../styles/memo_style.dart';
 import 'package:path/path.dart' as path;
@@ -229,6 +230,32 @@ class MemoListViewBuilder extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.only(top: 0, bottom: 16),
           child: Slidable(
+            startActionPane: ActionPane(
+              motion: const ScrollMotion(),
+              extentRatio: 0.2,
+              children: [
+                SlidableAction(
+                  onPressed: (context) {
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, anim, secondAnim) => const ConfigPage(),
+                        transitionsBuilder: (context, anim, secondAnim, child) {
+                          return SlideTransition(
+                            position: anim.drive(Tween(begin: const Offset(-1, 0), end: Offset.zero).chain(CurveTween(curve: Curves.easeOutCubic))),
+                            child: child,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                  backgroundColor: Colors.transparent, // 透明背景，丝滑跳转
+                  label: '设置',
+                  icon: Icons.settings_rounded,
+                  foregroundColor: Colors.blue,
+                ),
+              ],
+            ),
             endActionPane: ActionPane(
               motion: const DrawerMotion(),
               extentRatio: 0.25,

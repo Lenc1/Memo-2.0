@@ -13,7 +13,11 @@ class _ConfigPageState extends State<ConfigPage> {
   @override
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
-    return Scaffold(
+    return GestureDetector(
+      onHorizontalDragStart: (details){
+        Navigator.pop(context);
+      },
+      child: Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromRGBO(240, 251, 255, 1),
       appBar: AppBar(
@@ -44,9 +48,9 @@ class _ConfigPageState extends State<ConfigPage> {
                 builder: (context, updateTime, child) {
                   return Theme(
                     data: Theme.of(context).copyWith(
-                      splashColor: Colors.transparent, // 去掉水波纹
-                      highlightColor: Colors.transparent, // 去掉点击高亮
-                      hoverColor: Colors.transparent, // 去掉鼠标悬停（针对全平台更稳妥）
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      hoverColor: Colors.transparent,
                     ),
                     child: SwitchListTile(
                     title: const Text('编辑后更新时间',
@@ -68,6 +72,7 @@ class _ConfigPageState extends State<ConfigPage> {
           ),
         ),
       ),
+    ),
     );
   }
 }
